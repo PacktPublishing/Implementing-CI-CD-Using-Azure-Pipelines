@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "6SaBzn4rDEQnPwu0HERlJvOthBbit4ob3ljQiU1PunIX0NpCX4c92OrXIgYGugkQCbfSsih8ZL8D4QauWEFfZg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\rmard\\source\\repos\\PacktPublishing\\Implementing-CI-CD-Using-Azure-Pipelines\\NetCoreWebApi\\NetCoreWebApi\\NetCoreWebApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\rmard\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
+    "C:\\Users\\rmard\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\rmard\\.nuget\\packages\\swashbuckle.aspnetcore\\6.2.3\\swashbuckle.aspnetcore.6.2.3.nupkg.sha512",
+    "C:\\Users\\rmard\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.2.3\\swashbuckle.aspnetcore.swagger.6.2.3.nupkg.sha512",
+    "C:\\Users\\rmard\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.2.3\\swashbuckle.aspnetcore.swaggergen.6.2.3.nupkg.sha512",
+    "C:\\Users\\rmard\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.2.3\\swashbuckle.aspnetcore.swaggerui.6.2.3.nupkg.sha512"
+  ],
+  "logs": []
+}
