@@ -10,4 +10,4 @@ A sample repository of a ficticious online ecommerce store, used to demonstrate 
 Execute the pipeline and you will be able to see the execution of SonarQube analysis and link to results.
 
 ## Credits
-The application code of this repository was copied from [https://github.com/karlrissland/AppWorkshop]
+The application code in this repository was copied from [https://github.com/karlrissland/AppWorkshop]
