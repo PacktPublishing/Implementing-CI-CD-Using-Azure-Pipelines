@@ -17,7 +17,7 @@
     },
     "resources": [
         {
-            "tyXXpe": "Microsoft.Web/serverfarms",
+            "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2022-03-01",
             "name": "[variables('appServicePlanName')]",
             "location": "[resourceGroup().location]",
