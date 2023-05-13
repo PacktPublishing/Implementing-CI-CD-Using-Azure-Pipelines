@@ -4,7 +4,7 @@
     "parameters": {
         "webAppName": {
             "type": "string",
-            "defaultValue": "AzureLinuxApp",
+            "defaultValue": "[uniqueString(resourceGroup().id)]",
             "minLength": 2,
             "metadata": {
                 "description": "Base name of the resource such as web app name and app service plan "
@@ -12,7 +12,7 @@
         }
     },
     "variables": {
-        "webAppPortalName": "[format('{0}-webapp', parameters('webAppName'))]",
+        "webAppPortalName": "[format('Web-App-{0}', parameters('webAppName'))]",
         "appServicePlanName": "[format('AppServicePlan-{0}', parameters('webAppName'))]"
     },
     "resources": [
