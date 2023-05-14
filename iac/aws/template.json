@@ -1,0 +1,25 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Imported key pair and EC2 instance",
+    "Resources": {
+        "ImportedKeyPair": {
+            "Type": "AWS::EC2::KeyPair",
+            "Properties": {
+                "KeyName": "MyKeyPair",
+                "PublicKeyMaterial": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICfp1F7DhdWZdqkYAUGCzcBsLmJeu9izpIyGpmmg7eCz example"
+            }
+        },
+        "Ec2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-0889a44b331db0194",
+                "KeyName": {
+                    "Ref": "ImportedKeyPair"
+                }
+            },
+            "DependsOn": [
+                "ImportedKeyPair"
+            ]
+        }
+    }
+}
