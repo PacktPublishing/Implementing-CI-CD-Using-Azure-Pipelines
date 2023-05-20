@@ -1,0 +1,16 @@
+# AWS Cloud Formation Deployment
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+steps:
+- task: CloudFormationCreateOrUpdateStack@1
+  inputs:
+    awsCredentials: 'aws-packt'
+    regionName: 'us-east-1'
+    stackName: 'packt'
+    templateSource: 'file'
+    templateFile: 'template.json'
+    capabilityIAM: false
+    capabilityNamedIAM: false
+    onFailure: 'DELETE'

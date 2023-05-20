@@ -1,0 +1,13 @@
+# AWS Cloud Formation Validation
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+steps:
+- task: AWSCLI@1
+  inputs:
+    awsCredentials: 'aws-packt'
+    regionName: 'us-east-1'
+    awsCommand: 'cloudformation'
+    awsSubCommand: 'validate-template'
+    awsArguments: '--template-body file://template.json'
