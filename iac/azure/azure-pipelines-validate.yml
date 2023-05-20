@@ -1,0 +1,17 @@
+# ARM Template pipeline
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+steps:
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'azure-packt-rg'
+    subscriptionId: $(AzureSubscriptionId)
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'packt'
+    location: 'East US'
+    templateLocation: 'Linked artifact'
+    csmFile: 'azure/azuredeploy.json'
+    deploymentMode: 'Validation'
