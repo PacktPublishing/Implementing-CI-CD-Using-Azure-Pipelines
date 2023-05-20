@@ -1,0 +1,25 @@
+# Terraform pipeline
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+steps:
+- task: TerraformInstaller@0
+  displayName: 'install'
+  inputs:
+    terraformVersion: 'latest'
+- task: TerraformTaskV4@4
+  displayName: 'init'
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'azure-packt-rg'
+    backendAzureRmResourceGroupName: 'tfstate'
+    backendAzureRmStorageAccountName: 'tfstate'
+    backendAzureRmContainerName: 'tfstate'
+    backendAzureRmKey: 'terraform.tfstate'
+- task: TerraformTaskV4@4
+  displayName: 'validate'
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
