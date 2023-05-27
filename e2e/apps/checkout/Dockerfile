@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
-EXPOSE 5242
+EXPOSE 5015
 
-ENV ASPNETCORE_URLS=http://+:5242
+ENV ASPNETCORE_URLS=http://+:5015
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-dotnet-configure-containers
@@ -10,10 +10,11 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-COPY ["checkout.csproj", "/checkout/"]
-WORKDIR "/checkout"
+WORKDIR /src
+COPY ["checkout.csproj", "/"]
 RUN dotnet restore "checkout.csproj"
 COPY . .
+WORKDIR "/checkout"
 RUN dotnet build "checkout.csproj" -c Release -o /app/build
 
 FROM build AS publish
