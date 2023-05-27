@@ -10,7 +10,6 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
 COPY ["checkout.csproj", "/checkout/"]
 RUN dotnet restore "checkout.csproj"
 COPY . .
