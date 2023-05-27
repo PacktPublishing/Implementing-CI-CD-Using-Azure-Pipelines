@@ -13,7 +13,6 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 COPY ["checkout.csproj", "/checkout/"]
 RUN dotnet restore "checkout.csproj"
 COPY . .
-WORKDIR "/checkout"
 RUN dotnet build "checkout.csproj" -c Release -o /app/build
 
 FROM build AS publish
