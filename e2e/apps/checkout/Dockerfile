@@ -11,10 +11,10 @@ USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["checkout.csproj", "/"]
-RUN dotnet restore "checkout.csproj"
+COPY ["e2e/apps/checkout/checkout.csproj", "e2e/apps/checkout/"]
+RUN dotnet restore "e2e/apps/checkout/checkout.csproj"
 COPY . .
-WORKDIR "/checkout"
+WORKDIR "/src/e2e/apps/checkout"
 RUN dotnet build "checkout.csproj" -c Release -o /app/build
 
 FROM build AS publish
