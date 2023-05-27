@@ -11,6 +11,7 @@ USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 COPY ["checkout.csproj", "/checkout/"]
+WORKDIR "/checkout"
 RUN dotnet restore "checkout.csproj"
 COPY . .
 RUN dotnet build "checkout.csproj" -c Release -o /app/build
