@@ -51,6 +51,12 @@ def get_product(sku):
     Get product by SKU
     Returns a product from the catalog
     ---
+    parameters:
+      - in: path
+        name: sku
+        schema:
+          type: string
+        required: true
     produces:
       - application/json
     responses:
@@ -62,7 +68,7 @@ def get_product(sku):
         description: Product not found
     """
     try:
-        product = find_product(int(sku))
+        product = find_product(sku)
         return jsonify(product)
     except:
         return jsonify({}), 404
@@ -92,7 +98,7 @@ def add_product():
     """    
     product = request.get_json()
     try:
-        p = find_product(int(product['sku']))
+        p = find_product(product['sku'])
         if (p != None):
             return jsonify({'message': f'Product with SKU {p["sku"]} already exists.'}), 409
     except StopIteration:
@@ -128,7 +134,7 @@ def update_product_quantity(sku, quantity):
         description: Product not found in the catalog
     """    
     try:
-        product = find_product(int(sku))
+        product = find_product(sku)
         product['quantity'] = int(quantity)
         return jsonify(product)
     except:
@@ -163,7 +169,7 @@ def add_product_quantity(sku, quantity):
         description: Product not found in the catalog
     """
     try:
-        product = find_product(int(sku))
+        product = find_product(sku)
         product['quantity'] = product['quantity'] + int(quantity)
         return jsonify(product)
     except:
@@ -171,12 +177,12 @@ def add_product_quantity(sku, quantity):
 
 
 product_list = [
-    {'sku': 1, 'name': 'Product 1', 'quantity': 10, 'price': 100},
-    {'sku': 2, 'name': 'Product 2', 'quantity': 20, 'price': 50},
-    {'sku': 3, 'name': 'Product 3', 'quantity': 30, 'price': 75},
-    {'sku': 4, 'name': 'Product 4', 'quantity': 25, 'price': 60},
-    {'sku': 5, 'name': 'Product 5', 'quantity': 50, 'price': 200},
-    {'sku': 6, 'name': 'Product 5', 'quantity': 50, 'price': 200},
+    {'sku': "1", 'name': 'Product 1', 'quantity': 10, 'price': 100},
+    {'sku': "2", 'name': 'Product 2', 'quantity': 20, 'price': 50},
+    {'sku': "3", 'name': 'Product 3', 'quantity': 30, 'price': 75},
+    {'sku': "4", 'name': 'Product 4', 'quantity': 25, 'price': 60},
+    {'sku': "5", 'name': 'Product 5', 'quantity': 50, 'price': 200},
+    {'sku': "6", 'name': 'Product 5', 'quantity': 50, 'price': 200},
 ]
 
 
@@ -203,7 +209,7 @@ spec = APISpec(
 )
 
 class ProductSchema(Schema):
-    sku = fields.Integer()
+    sku = fields.String()
     name = fields.String()
     quantity = fields.Integer()
     price = fields.Float()
