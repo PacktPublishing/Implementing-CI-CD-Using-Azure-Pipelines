@@ -10,11 +10,10 @@ RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /
 USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["e2e/apps/checkout/checkout.csproj", "e2e/apps/checkout/"]
-RUN dotnet restore "e2e/apps/checkout/checkout.csproj"
+WORKDIR "/apps/checkout"
+COPY ["checkout.csproj", "/apps/checkout/"]
+RUN dotnet restore "checkout.csproj"
 COPY . .
-WORKDIR "/src/e2e/apps/checkout"
 RUN dotnet build "checkout.csproj" -c Release -o /app/build
 
 FROM build AS publish
