@@ -75,11 +75,16 @@
             "type": "docker-run",
             "label": "docker-run: debug",
             "dependsOn": [
-                "docker-build: debug"
+                "docker-build"
             ],
-            "dockerRun": {},
-            "netCore": {
-                "appProject": "${workspaceFolder}/e2e/apps/checkout/checkout.csproj",
+            "dockerRun": {
+                "env": {
+                    "DEBUG": "*",
+                    "NODE_ENV": "development"
+                }
+            },
+            "node": {
+                "package": "${workspaceFolder}/e2e/apps/cart/package.json",
                 "enableDebugging": true
             }
         },
@@ -87,22 +92,24 @@
             "type": "docker-run",
             "label": "docker-run: release",
             "dependsOn": [
-                "docker-build: release"
+                "docker-build"
             ],
-            "dockerRun": {},
-            "netCore": {
-                "appProject": "${workspaceFolder}/e2e/apps/checkout/checkout.csproj"
+            "platform": "node",
+            "node": {
+                "package": "${workspaceFolder}/e2e/apps/cart/package.json"
             }
         },
         {
             "type": "docker-build",
             "label": "docker-build",
-            "platform": "python",
+            "platform": "node",
             "dockerBuild": {
-                "tag": "implementingcicdusingazurepipelines:latest",
-                "dockerfile": "${workspaceFolder}/Dockerfile",
-                "context": "${workspaceFolder}",
+                "dockerfile": "${workspaceFolder}/e2e/apps/cart/Dockerfile",
+                "context": "${workspaceFolder}/e2e/apps/cart",
                 "pull": true
+            },
+            "node": {
+                "package": "${workspaceFolder}/e2e/apps/cart/package.json"
             }
         }
     ]

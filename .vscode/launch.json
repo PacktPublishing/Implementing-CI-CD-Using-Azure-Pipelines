@@ -49,6 +49,17 @@
                 ],
                 "projectType": "flask"
             }
+        },
+        {
+            "name": "Docker Node.js Launch",
+            "type": "docker",
+            "request": "launch",
+            "preLaunchTask": "docker-run: debug",
+            "platform": "node",
+            "node": {
+                "package": "${workspaceFolder}/e2e/apps/cart/package.json",
+                "localRoot": "${workspaceFolder}/e2e/apps/cart"
+            }
         }
     ]
 }
