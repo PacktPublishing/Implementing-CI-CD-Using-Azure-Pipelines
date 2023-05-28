@@ -1,7 +1,9 @@
 import { Cart, CartItem } from './models.js';
+import async from 'async';
 
 // Sets up the routes.
-export default function setup(app) {
+export default function setup(app, redisClient) {
+    const prefix = 'Cart:';
     var carts = [];
 
     /**
@@ -53,7 +55,21 @@ export default function setup(app) {
      *              $ref: '#/definitions/Cart'
      */
     app.get('/carts', (req, res) => {
-        res.json(carts);
+        var cs = [];
+        redisClient.keys(`${prefix}*`).then((keys) => {
+            if (keys) {
+                async.map(keys, (key, cb) => {
+                    redisClient.json.get(key).then((value) => {
+                        var cart = Object.assign(new Cart(), value);
+                        cs.push(cart);
+                        cb();
+                    });
+                }, err => {
+                    if (err) res.status(404).send();
+                    res.json(cs);
+                });
+            }
+        });
     });
 
     /**
@@ -72,7 +88,7 @@ export default function setup(app) {
      */
     app.post('/carts', (req, res) => {
         var cart = new Cart();
-        carts.push(cart);
+        redisClient.json.set(`${prefix}${cart.id}`, '.', cart);
         res.json(cart);
     });
 
@@ -99,12 +115,9 @@ export default function setup(app) {
      *         description: Cart not found
      */
     app.get('/carts/:id', (req, res) => {
-        var cart = carts.find((cart) => cart.id == req.params.id);
-        if (cart) {
-            res.json(cart);
-        } else {
-            res.status(404).send();
-        }
+        redisClient.json.get(`${prefix}${req.params.id}`).then((value) => {
+            res.json(value);
+        });
     });
 
     /**
@@ -134,19 +147,23 @@ export default function setup(app) {
      *         description: Cart not found
      */
     app.post('/carts/:id/item', (req, res) => {
-        var cart = carts.find((cart) => cart.id == req.params.id);
-        if (cart) {
-            var newItem = Object.assign(new CartItem(), req.body);
-            var item = cart.items.find((item) => item.sku == newItem.sku);
-            if (item) {
-                item.quantity += newItem.quantity;
-                item.price = newItem.price;
+        redisClient.json.get(`${prefix}${req.params.id}`).then((value) => {
+            var cart = Object.assign(new Cart(), value);
+            if (cart) {
+                var newItem = Object.assign(new CartItem(), req.body);
+                var item = cart.items.find((item) => item.sku == newItem.sku);
+                if (item) {
+                    item.quantity += newItem.quantity;
+                    item.price = newItem.price;
+                } else {
+                    cart.items.push(newItem);
+                }
+                redisClient.json.set(`${prefix}${cart.id}`, '.', cart).then(() => {
+                    res.json(cart);
+                });
             } else {
-                cart.items.push(newItem);
+                res.status(404).send();
             }
-            res.json(cart);
-        } else {
-            res.status(404).send();
-        }
+        });
     });
 }

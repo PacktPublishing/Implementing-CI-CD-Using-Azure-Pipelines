@@ -6,11 +6,14 @@ import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import routes from "./routes.js";
+import redis from 'redis';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5075;
+const redisHost = process.env.REDIS_HOST || "127.0.0.1";
+const redisPort = process.env.REDIS_PORT || 6379;
 
 app.use(cors());
 // app.use(bodyParser.json()); // To support JSON-encoded bodies
@@ -27,8 +30,24 @@ app.get("/", (req, res) => {
     res.redirect("/swagger");
 });
 
+// Create a redis client and ensure connection
+const redisClient = redis.createClient(redisHost, redisPort);
+
+redisClient
+    .on('connect', () => {
+        console.info('Redis connected!');
+    })
+    .on('ready', () => {
+        console.info('Redis ready to use!');
+    })
+    .on('error', (err) => {
+        console.err('Error occurred with redis: ' + err);
+    });
+
+await redisClient.connect();
+
 // Set up the routes
-routes(app);
+routes(app, redisClient);
 
 const options = {
     failOnErrors: true,
