@@ -93,6 +93,17 @@
             "netCore": {
                 "appProject": "${workspaceFolder}/e2e/apps/checkout/checkout.csproj"
             }
+        },
+        {
+            "type": "docker-build",
+            "label": "docker-build",
+            "platform": "python",
+            "dockerBuild": {
+                "tag": "implementingcicdusingazurepipelines:latest",
+                "dockerfile": "${workspaceFolder}/Dockerfile",
+                "context": "${workspaceFolder}",
+                "pull": true
+            }
         }
     ]
 }
