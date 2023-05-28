@@ -136,8 +136,14 @@ export default function setup(app) {
     app.post('/carts/:id/item', (req, res) => {
         var cart = carts.find((cart) => cart.id == req.params.id);
         if (cart) {
-            var item = Object.assign(new CartItem(), req.body);
-            cart.items.push(item);
+            var newItem = Object.assign(new CartItem(), req.body);
+            var item = cart.items.find((item) => item.sku == newItem.sku);
+            if (item) {
+                item.quantity += newItem.quantity;
+                item.price = newItem.price;
+            } else {
+                cart.items.push(newItem);
+            }
             res.json(cart);
         } else {
             res.status(404).send();
