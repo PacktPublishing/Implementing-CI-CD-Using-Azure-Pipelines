@@ -5,7 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js",
+    "watch": "nodemon app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Roberto Mardeni",
@@ -16,10 +17,10 @@
     "express": "^4.18.2",
     "redis": "^4.6.6",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^4.6.3"
+    "swagger-ui-express": "^4.6.3",
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
-    "dotenv": "^16.0.3",
     "nodemon": "^2.0.22"
   }
 }
