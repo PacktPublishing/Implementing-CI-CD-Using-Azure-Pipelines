@@ -5,13 +5,11 @@ from apispec_webframeworks.flask import FlaskPlugin
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
-    return redirect('/apidocs')
+    return redirect('/swagger')
 
-# @app.route("/spec")
-# def spec():
-#     return jsonify(swagger)
 
 @app.route('/health')
 def get_health():
@@ -95,7 +93,7 @@ def add_product():
           $ref: '#/definitions/Product'
       409:
         description: Product not added to the catalog
-    """    
+    """
     product = request.get_json()
     try:
         p = find_product(product['sku'])
@@ -132,7 +130,7 @@ def update_product_quantity(sku, quantity):
           $ref: '#/definitions/Product'
       404:
         description: Product not found in the catalog
-    """    
+    """
     try:
         product = find_product(sku)
         product['quantity'] = int(quantity)
@@ -197,6 +195,7 @@ def get_products_list():
 def find_product(sku):
     return next(p for p in get_products_list() if p["sku"] == sku)
 
+
 # Create an APISpec
 spec = APISpec(
     title='Packt Store Catalog API',
@@ -205,8 +204,12 @@ spec = APISpec(
     plugins=[
         FlaskPlugin(),
         MarshmallowPlugin(),
-    ],
+    ]
 )
+swagger_config = {
+    'specs_route': '/swagger/'
+}
+
 
 class ProductSchema(Schema):
     sku = fields.String()
@@ -214,13 +217,15 @@ class ProductSchema(Schema):
     quantity = fields.Integer()
     price = fields.Float()
 
+
 template = spec.to_flasgger(
     app,
     definitions=[ProductSchema],
-    paths=[get_health, get_products, get_product, add_product, update_product_quantity, add_product_quantity]
+    paths=[get_health, get_products, get_product, add_product,
+           update_product_quantity, add_product_quantity]
 )
 
-swagger = Swagger(app, template=template)
+swagger = Swagger(app, template=template, config=swagger_config, merge=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5050)
+    app.run(debug=True, host="0.0.0.0", port=5050)
