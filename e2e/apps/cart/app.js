@@ -11,9 +11,11 @@ import redis from 'redis';
 dotenv.config({ debug: true, override: true });
 
 const app = express();
-const port = process.env.PORT || 5075;
-const redisHost = process.env.REDIS_HOST || "127.0.0.1";
-const redisPort = process.env.REDIS_PORT || 6379;
+const port = process.env.PORT;
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
+
+console.log(`Redis Host is ${redisHost}:${redisPort}`);
 
 app.use(cors());
 // app.use(bodyParser.json()); // To support JSON-encoded bodies
