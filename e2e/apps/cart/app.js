@@ -8,7 +8,7 @@ import swaggerUI from "swagger-ui-express";
 import routes from "./routes.js";
 import redis from 'redis';
 
-dotenv.config();
+dotenv.config({ debug: true, override: true });
 
 const app = express();
 const port = process.env.PORT || 5075;
