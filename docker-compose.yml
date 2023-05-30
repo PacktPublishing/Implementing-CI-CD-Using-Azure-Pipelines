@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  redis:
+    image: redis/redis-stack:latest
+    restart: always
+    ports:
+      - 6379:6379
+  cart:
+    image: packt-store-cart:latest
+    build:
+      context: e2e/apps/cart
+      dockerfile: ./Dockerfile
+    depends_on:
+      - redis
+    environment:
+      NODE_ENV: production
+      PORT: 5075
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - 5075:5075

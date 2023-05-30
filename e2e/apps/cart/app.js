@@ -35,7 +35,9 @@ redisClient
         console.info('Redis ready to use!');
     })
     .on('error', (err) => {
-        console.err('Error occurred with redis: ' + err);
+        redisClient.quit();
+        console.error('Error occurred with redis: ' + err);
+        process.exit(1);
     });
 
 await redisClient.connect();
