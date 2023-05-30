@@ -166,4 +166,36 @@ export default function setup(app, redisClient) {
             }
         });
     });
+
+    /**
+     * @swagger
+     * /carts/{id}:
+     *   delete:
+     *     description: Deletes a shopping cart by its id
+     *     tags: [Cart]
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         schema:
+     *           type: string
+     *         required: true
+     *     produces:
+     *       - application/json
+     *     responses:
+     *       200:
+     *         description: Cart deleted
+     *       404:
+     *         description: Cart not found
+     */
+    app.delete('/carts/:id', (req, res) => {
+        redisClient.json.get(`${prefix}${req.params.id}`).then((value) => {
+            if (value) {
+                redisClient.del(`${prefix}${req.params.id}`).then(() => {
+                    res.status(200).send();
+                });
+            } else {
+                res.status(404).send();
+            }
+        });
+    });
 }
