@@ -1,6 +1,5 @@
 // ES6 style
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
@@ -18,15 +17,8 @@ const redisPort = process.env.REDIS_PORT;
 console.log(`Redis Host is ${redisHost}:${redisPort}`);
 
 app.use(cors());
-// app.use(bodyParser.json()); // To support JSON-encoded bodies
 app.use(express.json());
-app.use(express.urlencoded());
-// app.use(
-//     bodyParser.urlencoded({
-//         // To support URL-encoded bodies
-//         extended: true,
-//     })
-// );
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
     res.redirect("/swagger");
