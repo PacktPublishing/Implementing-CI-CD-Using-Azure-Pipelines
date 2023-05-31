@@ -22,7 +22,9 @@ app.get("/", (req, res) => {
 });
 
 // Create a redis client and ensure connection
-const redisClient = redis.createClient(redisHost, redisPort);
+const redisClient = redis.createClient({
+    url: `redis://${redisHost}:${redisPort}`,
+});
 
 redisClient
     .on('connect', () => {
