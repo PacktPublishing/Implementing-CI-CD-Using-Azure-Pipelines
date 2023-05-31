@@ -1,13 +1,10 @@
 // ES6 style
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import routes from "./routes.js";
 import redis from 'redis';
-
-dotenv.config({ debug: true, override: true });
 
 const app = express();
 const port = process.env.PORT;
@@ -34,9 +31,12 @@ redisClient
     .on('ready', () => {
         console.info('Redis ready to use!');
     })
+    .on('end', () => {
+        console.info('Redis disconnected!');
+    })
     .on('error', (err) => {
         redisClient.quit();
-        console.error('Error occurred with redis: ' + err);
+        console.error('Redis not available!');
         process.exit(1);
     });
 

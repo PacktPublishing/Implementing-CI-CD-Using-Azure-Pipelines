@@ -5,8 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "watch": "nodemon app.js",
-    "start": "node app.js",
+    "watch": "nodemon -r dotenv/config app.js",
+    "start": "node -r dotenv/config app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Roberto Mardeni",
