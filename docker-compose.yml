@@ -6,6 +6,15 @@ services:
     restart: always
     ports:
       - 6379:6379
+  catalog:
+    image: packt-store-catalog:latest
+    build:
+      context: e2e/apps/catalog
+      dockerfile: ./Dockerfile
+    environment:
+      PORT: 5050
+    ports:
+      - 5050:5050
   cart:
     image: packt-store-cart:latest
     build:
@@ -20,3 +29,12 @@ services:
       REDIS_PORT: 6379
     ports:
       - 5075:5075
+  checkout:
+    image: packt-store-checkout:latest
+    build:
+      context: e2e/apps/checkout
+      dockerfile: ./Dockerfile
+    environment:
+      PORT: 5015
+    ports:
+      - 5015:5015
