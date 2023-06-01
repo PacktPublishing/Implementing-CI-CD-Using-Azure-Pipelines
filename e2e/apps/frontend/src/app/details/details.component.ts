@@ -3,14 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ProductService } from '../product.service';
 import { Product } from '../product';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-details',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule
+    CommonModule
   ],
   template: `
     <article>
@@ -29,24 +27,10 @@ export class DetailsComponent {
   productService = inject(ProductService);
   product: Product | undefined;
 
-  applyForm = new FormGroup({
-    firstName: new FormControl(''),
-    lastName: new FormControl(''),
-    email: new FormControl('')
-  });
-
   constructor() {
     const sku = String(this.route.snapshot.params['sku']);
     this.productService.getProductBySku(sku).then(product => {
       this.product = product;
     });
-  }
-
-  submitApplication() {
-    this.productService.submitApplication(
-      this.applyForm.value.firstName ?? '',
-      this.applyForm.value.lastName ?? '',
-      this.applyForm.value.email ?? ''
-    );
   }
 }
