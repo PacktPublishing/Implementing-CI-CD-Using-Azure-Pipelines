@@ -1,10 +1,11 @@
 from flask import Flask, request, redirect, jsonify
+from flask_cors import CORS
 from flasgger import APISpec, Schema, Swagger, fields
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
 
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/')
 def index():
