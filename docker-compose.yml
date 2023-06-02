@@ -38,3 +38,12 @@ services:
       PORT: 5015
     ports:
       - 5015:5015
+  frontend:
+    image: packt-store-frontend:latest
+    build:
+      context: e2e/apps/frontend
+      dockerfile: ./Dockerfile
+    environment:
+      PORT: 5030
+    ports:
+      - 5030:80
