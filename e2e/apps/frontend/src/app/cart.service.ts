@@ -20,6 +20,10 @@ export class CartService {
   constructor(private http: HttpClient) {
     var cartId = this.cookieService.get('cartId');
 
+    this.initializeCart(cartId);
+  }
+
+  initializeCart(cartId: String) {
     this.init(cartId).subscribe(cart => {
       this.cart = cart;
       this.cookieService.set('cartId', this.cart?.id as string);
@@ -29,7 +33,7 @@ export class CartService {
 
   init(cartId: String): Observable<Cart> {
     console.log("[CartService] init");
-    if (cartId) {
+    if (cartId !== undefined && cartId !== '') {
       return this.http.get<Cart>(this.url + 'carts/' + cartId);
     } else {
       return this.http.post<Cart>(this.url + 'carts', {});
@@ -52,6 +56,15 @@ export class CartService {
     response.subscribe(cart => {
       this.cart = cart;
       this.change.emit(this.cart);
+    });
+    return response;
+  }
+
+  clearCart(): Observable<void> {
+    console.log(`[CartService] Clear cart: ${this.cart?.id}`);
+    var response = this.http.delete<void>(this.url + 'carts/' + this.cart?.id);
+    response.subscribe(() => {
+      this.initializeCart('');
     });
     return response;
   }
