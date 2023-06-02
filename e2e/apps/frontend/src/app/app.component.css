@@ -15,3 +15,7 @@ header.brand-name {
 .content {
   padding: var(--content-padding);
 }
+section.cart-indicator {
+  float: right;
+  margin: 25px;
+}

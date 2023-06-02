@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HomeComponent } from './home/home.component';
+import { CartIndicatorComponent } from './cart-indicator/cart-indicator.component';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -7,10 +8,14 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [
     HomeComponent,
-    RouterModule
+    RouterModule,
+    CartIndicatorComponent
   ],
   template: `
     <main>
+      <section class="cart-indicator">
+        <app-cart-indicator></app-cart-indicator>
+      </section>
       <a [routerLink]="['/']">
         <header class="brand-name">
           Pack Store

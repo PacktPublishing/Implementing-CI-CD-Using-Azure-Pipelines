@@ -1,7 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '../product';
 import { RouterModule } from '@angular/router';
+import { CartService } from '../cart.service';
 
 @Component({
   selector: 'app-product',
@@ -14,7 +15,6 @@ import { RouterModule } from '@angular/router';
     <section class="product">
       <h2 class="product-name">{{ product.name }}</h2>
       <p class="product-price">{{ product.price | currency }}</p>
-      <a [routerLink]="['/details', product.sku]">Learn More</a>
       <button class="primary" type="button" (click)="addToCart(product.sku)">Add to Cart</button>
     </section>
   `,
@@ -22,8 +22,10 @@ import { RouterModule } from '@angular/router';
 })
 export class ProductComponent {
   @Input() product!: Product;
+  cartService: CartService = inject(CartService);
 
   addToCart(sku: string) {
-    console.log(`Add product ${sku} to cart`);
+    console.log("[Product] Add to cart: " + sku)
+    this.cartService.addToCart(this.product);
   }
 }
