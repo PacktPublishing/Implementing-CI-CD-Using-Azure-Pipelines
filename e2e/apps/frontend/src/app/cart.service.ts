@@ -5,27 +5,35 @@ import { Product } from './product';
 import { Cart } from './cart';
 import { CartItem } from './cartitem';
 import { Observable } from 'rxjs';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-
+  cookieService: CookieService = inject(CookieService);
   settingsService: SettingsService = inject(SettingsService);
   url = this.settingsService.getCartApiUrl();
   cart: Cart | undefined;
   @Output() change = new EventEmitter<Cart>();
 
   constructor(private http: HttpClient) {
-    this.init().subscribe(cart => {
+    var cartId = this.cookieService.get('cartId');
+
+    this.init(cartId).subscribe(cart => {
       this.cart = cart;
+      this.cookieService.set('cartId', this.cart?.id as string);
       this.change.emit(this.cart);
     });
   }
 
-  init(): Observable<Cart> {
+  init(cartId: String): Observable<Cart> {
     console.log("[CartService] init");
-    return this.http.post<Cart>(this.url + 'carts', {});
+    if (cartId) {
+      return this.http.get<Cart>(this.url + 'carts/' + cartId);
+    } else {
+      return this.http.post<Cart>(this.url + 'carts', {});
+    }
   }
 
   getCart(): Cart {
