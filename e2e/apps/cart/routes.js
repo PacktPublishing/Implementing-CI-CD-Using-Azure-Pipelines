@@ -198,4 +198,33 @@ export default function setup(app, redisClient) {
             }
         });
     });
+
+    /**
+     * @swagger
+     * /carts:
+     *   delete:
+     *     description: Deletes all shopping carts
+     *     tags: [Cart]
+     *     produces:
+     *       - application/json
+     *     responses:
+     *       200:
+     *         description: Carts deleted
+     *       404:
+     *         description: Carts not found
+     */
+    app.delete('/carts', (req, res) => {
+        redisClient.keys(`${prefix}*`).then((keys) => {
+            if (keys) {
+                async.map(keys, (key, cb) => {
+                    redisClient.json.del(key).then((value) => {
+                        cb();
+                    });
+                }, err => {
+                    if (err) res.status(404).send();
+                    res.status(200).send();
+                });
+            }
+        });
+    });
 }
