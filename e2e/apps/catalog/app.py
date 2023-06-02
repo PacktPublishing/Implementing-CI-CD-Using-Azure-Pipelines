@@ -176,18 +176,18 @@ def add_product_quantity(sku, quantity):
 
 
 product_list = [
-    {'sku': "1", 'name': 'Product 1', 'quantity': 10, 'price': 100, 'photo': '/assets/product1.jpg'},
-    {'sku': "2", 'name': 'Product 2', 'quantity': 20, 'price': 50, 'photo': '/assets/product2.jpg'},
-    {'sku': "3", 'name': 'Product 3', 'quantity': 30, 'price': 75, 'photo': '/assets/product3.jpg'},
-    {'sku': "4", 'name': 'Product 4', 'quantity': 25, 'price': 60, 'photo': '/assets/product4.jpg'},
-    {'sku': "5", 'name': 'Product 5', 'quantity': 50, 'price': 200, 'photo': '/assets/product5.jpg'},
-    {'sku': "6", 'name': 'Product 6', 'quantity': 50, 'price': 200, 'photo': '/assets/product6.jpg'},
-    {'sku': "7", 'name': 'Product 7', 'quantity': 10, 'price': 100, 'photo': '/assets/product7.jpg'},
-    {'sku': "8", 'name': 'Product 8', 'quantity': 20, 'price': 50, 'photo': '/assets/product8.jpg'},
-    {'sku': "9", 'name': 'Product 9', 'quantity': 30, 'price': 75, 'photo': '/assets/product9.jpg'},
-    {'sku': "10", 'name': 'Product 10', 'quantity': 25, 'price': 60, 'photo': '/assets/product10.jpg'},
-    {'sku': "11", 'name': 'Product 11', 'quantity': 50, 'price': 200, 'photo': '/assets/product11.jpg'},
-    {'sku': "12", 'name': 'Product 12', 'quantity': 50, 'price': 200, 'photo': '/assets/product12.jpg'},
+    {'sku': "1", 'name': 'Product 1', 'quantity': 10, 'price': 100},
+    {'sku': "2", 'name': 'Product 2', 'quantity': 20, 'price': 50},
+    {'sku': "3", 'name': 'Product 3', 'quantity': 30, 'price': 75},
+    {'sku': "4", 'name': 'Product 4', 'quantity': 25, 'price': 60},
+    {'sku': "5", 'name': 'Product 5', 'quantity': 50, 'price': 200},
+    {'sku': "6", 'name': 'Product 6', 'quantity': 50, 'price': 200},
+    {'sku': "7", 'name': 'Product 7', 'quantity': 10, 'price': 100},
+    {'sku': "8", 'name': 'Product 8', 'quantity': 20, 'price': 50},
+    {'sku': "9", 'name': 'Product 9', 'quantity': 30, 'price': 75},
+    {'sku': "10", 'name': 'Product 10', 'quantity': 25, 'price': 60},
+    {'sku': "11", 'name': 'Product 11', 'quantity': 50, 'price': 200},
+    {'sku': "12", 'name': 'Product 12', 'quantity': 50, 'price': 200},
 ]
 
 
