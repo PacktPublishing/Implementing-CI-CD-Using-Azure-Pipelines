@@ -5,9 +5,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin();
+        policy.AllowAnyMethod();
+        policy.AllowAnyHeader();
+    });
+});
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -15,7 +25,7 @@ app.UseSwaggerUI();
 app.MapPost("/checkout", (CheckoutRequest request) => new CheckoutResponse
 {
     OrderId = Guid.NewGuid().ToString(),
-    Message = $"Thank you for your order {request.Order.Customer.FirstName} {request.Order.Customer.LastName}"
+    Message = $"Thank you for your order {request.Customer.FirstName} {request.Customer.LastName}, you should receive an email shortly at {request.Customer.Email}"
 })
     .WithOpenApi(operation => new(operation)
     {
@@ -54,20 +64,14 @@ public class OrderItem
     public int Quantity { get; set; }
     public float Price { get; set; }
 }
-public class Order
-{
-    public Order() { }
-
-    public Customer Customer { get; set; }
-    // A list of items in the order.
-    public List<OrderItem> Items { get; set; }
-}
 
 public class CheckoutRequest
 {
     public CheckoutRequest() { }
 
-    public Order Order { get; set; }
+    public Customer Customer { get; set; }
+    // A list of items in the order.
+    public List<OrderItem> Items { get; set; }
 }
 
 public class CheckoutResponse
