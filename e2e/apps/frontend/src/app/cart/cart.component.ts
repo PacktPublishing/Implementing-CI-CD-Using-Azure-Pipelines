@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Cart } from '../cart';
 import { CartItem } from '../cartitem';
 import { CartService } from '../cart.service';
-import { CartItemComponent } from '../cart-item/cart-item.component';
 import { MatTableModule } from '@angular/material/table';
 
 @Component({
@@ -11,7 +10,6 @@ import { MatTableModule } from '@angular/material/table';
   standalone: true,
   imports: [
     CommonModule,
-    CartItemComponent,
     MatTableModule
   ],
   template: `
