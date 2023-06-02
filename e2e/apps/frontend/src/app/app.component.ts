@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HomeComponent } from './home/home.component';
 import { CartIndicatorComponent } from './cart-indicator/cart-indicator.component';
 import { RouterModule } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +11,9 @@ import { RouterModule } from '@angular/router';
   imports: [
     HomeComponent,
     RouterModule,
-    CartIndicatorComponent
+    CartIndicatorComponent,
+    MatButtonModule,
+    MatIconModule
   ],
   template: `
     <main>
@@ -18,6 +22,9 @@ import { RouterModule } from '@angular/router';
       </section>
       <a [routerLink]="['/']">
         <header class="brand-name">
+          <button mat-mini-fab color="primary" aria-label="Packt Store">
+            <mat-icon>home</mat-icon>
+          </button>
           Pack Store
         </header>
       </a>

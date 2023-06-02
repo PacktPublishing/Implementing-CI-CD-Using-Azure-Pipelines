@@ -3,21 +3,21 @@ import { CommonModule } from '@angular/common';
 import { ProductComponent } from '../product/product.component';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     CommonModule,
-    ProductComponent
+    ProductComponent,
+    MatButtonModule
   ],
   template: `
     <section>
-      <form #form>
-        <input type="text" placeholder="Filter by product" #filter>
-        <button class="primary" type="button" (click)="filterResults(filter.value)">Search</button>
-        <button class="secondary" type="button" (click)="form.reset();reset()">Reset</button>
-      </form>
+      <input type="text" placeholder="Filter by product" #filter>
+      <button class="search" mat-raised-button color="primary" (click)="filterResults(filter.value)">Search</button>
+      <button class="reset" mat-raised-button color="warn" (click)="reset(); filter.value='';">Reset</button>
     </section>
     <section class="results">
       <app-product
