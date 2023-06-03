@@ -1,9 +1,9 @@
 import { Injectable, inject, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SettingsService } from './settings.service';
+import { ConfigService } from './config.service';
 import { Product } from './product';
 import { Cart } from './cart';
-import { CartItem } from './cartitem';
+import { CartItem } from './cart-item';
 import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -12,8 +12,8 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class CartService {
   cookieService: CookieService = inject(CookieService);
-  settingsService: SettingsService = inject(SettingsService);
-  url = this.settingsService.getCartApiUrl();
+  configService: ConfigService = inject(ConfigService);
+  url = this.configService.getCartApiUrl();
   cart: Cart | undefined;
   @Output() change = new EventEmitter<Cart>();
 

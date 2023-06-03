@@ -1,18 +1,18 @@
 import { Injectable, Output, EventEmitter, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SettingsService } from './settings.service';
+import { ConfigService } from './config.service';
 import { Cart } from './cart';
-import { CartItem } from './cartitem';
-import { OrderRequest, OrderItem } from './orderrequest';
+import { CartItem } from './cart-item';
+import { OrderRequest, OrderItem } from './order-request';
 import { Observable } from 'rxjs';
-import { OrderResponse } from './orderresponse';
+import { OrderResponse } from './order-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CheckoutService {
-  settingsService: SettingsService = inject(SettingsService);
-  url = this.settingsService.getCheckoutApiUrl();
+  configService: ConfigService = inject(ConfigService);
+  url = this.configService.getCheckoutApiUrl();
   orderResponse: OrderResponse | undefined;
   @Output() change = new EventEmitter<OrderResponse>();
 

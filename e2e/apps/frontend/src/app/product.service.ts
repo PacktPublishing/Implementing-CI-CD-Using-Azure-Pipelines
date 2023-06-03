@@ -1,14 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { Product } from './product';
-import { SettingsService } from './settings.service';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
 
-  settingsService: SettingsService = inject(SettingsService);
-  url = this.settingsService.getCatalogApiUrl();
+  configService: ConfigService = inject(ConfigService);
+  url = this.configService.getCatalogApiUrl();
 
   constructor() { }
 

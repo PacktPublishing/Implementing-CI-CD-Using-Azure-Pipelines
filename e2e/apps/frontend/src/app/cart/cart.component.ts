@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Cart } from '../cart';
-import { CartItem } from '../cartitem';
+import { CartItem } from '../cart-item';
 import { CartService } from '../cart.service';
 import { MatTableModule } from '@angular/material/table';
 import {
