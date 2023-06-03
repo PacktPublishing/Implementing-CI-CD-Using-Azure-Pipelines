@@ -11,25 +11,4 @@ export function loadConfig(configService: ConfigService) {
   return () => configService.loadConfig();
 }
 
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    BrowserAnimationsModule    
-  ],
-  providers: [
-    ConfigService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: loadConfig,
-      deps: [ConfigService],
-      multi: true
-    }
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+
