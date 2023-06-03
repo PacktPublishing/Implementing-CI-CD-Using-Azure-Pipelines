@@ -1,0 +1,5 @@
+{
+  "catalogApiUrl": "$CATALOG_API_URL",
+  "cartApiUrl": "$CART_API_URL",
+  "checkoutApiUrl": "$CHECKOUT_API_URL"
+}

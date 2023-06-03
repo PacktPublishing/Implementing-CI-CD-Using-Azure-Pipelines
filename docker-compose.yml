@@ -45,5 +45,8 @@ services:
       dockerfile: ./Dockerfile
     environment:
       PORT: 5030
+      CATALOG_API_URL: http://localhost:5050/
+      CART_API_URL: http://localhost:5075/
+      CHECKOUT_API_URL: http://localhost:5015/
     ports:
       - 5030:80
