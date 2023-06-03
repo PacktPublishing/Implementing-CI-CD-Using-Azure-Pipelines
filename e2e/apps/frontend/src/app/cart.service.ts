@@ -19,21 +19,26 @@ export class CartService {
 
   constructor(private http: HttpClient) {
     var cartId = this.cookieService.get('cartId');
-
     this.initializeCart(cartId);
   }
 
   initializeCart(cartId: String) {
+    console.log("[CartService] initializeCart with " + cartId);
     this.init(cartId).subscribe(cart => {
-      this.cart = cart;
-      this.cookieService.set('cartId', this.cart?.id as string);
-      this.change.emit(this.cart);
+      // Check if cart is valid from cookie
+      if (cart === undefined || cart === null) {
+        this.initializeCart('');
+      } else {
+        this.cart = cart;
+        this.cookieService.set('cartId', this.cart?.id as string);
+        this.change.emit(this.cart);
+      }
     });
   }
 
   init(cartId: String): Observable<Cart> {
     console.log("[CartService] init");
-    if (cartId !== undefined && cartId !== '') {
+    if (cartId !== undefined && cartId !== '' && cartId !== 'undefined') {
       return this.http.get<Cart>(this.url + 'carts/' + cartId);
     } else {
       return this.http.post<Cart>(this.url + 'carts', {});
