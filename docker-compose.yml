@@ -35,6 +35,7 @@ services:
       context: e2e/apps/checkout
       dockerfile: ./Dockerfile
     environment:
+      ASPNETCORE_URLS: "http://+:5015"
       PORT: 5015
     ports:
       - 5015:5015
