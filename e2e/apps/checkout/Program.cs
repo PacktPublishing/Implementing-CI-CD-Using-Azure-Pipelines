@@ -42,6 +42,9 @@ app.MapGet("/health", () => Results.Ok())
         Description = "Indicates the health of the service"
     });
 
+// Redirect to swagger UI
+app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
+
 app.Logger.LogInformation("Checkout app started");
 
 app.Run();
