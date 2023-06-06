@@ -1,0 +1,140 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "eastus"
+        },
+        "environmentName": {
+            "type": "string",
+            "defaultValue": "test"
+        },
+        "kubernetesVersion": {
+            "type": "string",
+            "defaultValue": "1.25.6"
+        },
+        "registryName": {
+            "type": "string",
+            "defaultValue": "packtadocicd"
+        },
+        "registryResourceGroup": {
+            "type": "string",
+            "defaultValue": "packt"
+        },
+        "guidValue": {
+            "type": "string",
+            "metadata": {
+                "description": "The unique id used in the role assignment of the kubernetes service to the container registry service. It is recommended to use the default value."
+            },
+            "defaultValue": "[newGuid()]"
+        }
+    },
+    "variables": {
+        "clusterName": "[concat(parameters('environmentName'), '-aks-packt-store-catalog')]",
+        "dnsPrefix": "[concat(parameters('environmentName'), '-aks-packt-store-catalog-dns')]",
+        "nodeResourceGroup": "[concat('MC_',variables('clusterName'))]"
+    },
+    "resources": [
+        {
+            "name": "ConnectAKStoACR-3b6b2896-a3a0-4f64-ac32-e0366fb9e079",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-05-01",
+            "resourceGroup": "[parameters('registryResourceGroup')]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', variables('clusterName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "apiVersion": "2018-09-01-preview",
+                            "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
+                            "name": "[concat(parameters('registryName'), '/Microsoft.Authorization/', parameters('guidValue'))]",
+                            "properties": {
+                                "principalId": "[reference(variables('clusterName'), '2023-01-01').identityProfile.kubeletidentity.objectId]",
+                                "principalType": "ServicePrincipal",
+                                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]",
+                                "scope": "[resourceId(parameters('registryResourceGroup'),'Microsoft.ContainerRegistry/registries/', parameters('registryName'))]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2023-01-01",
+            "dependsOn": [],
+            "type": "Microsoft.ContainerService/managedClusters",
+            "location": "[parameters('location')]",
+            "name": "[variables('clusterName')]",
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": true,
+                "dnsPrefix": "[variables('dnsPrefix')]",
+                "nodeResourceGroup": "[variables('nodeResourceGroup')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": 0,
+                        "count": 3,
+                        "enableAutoScaling": true,
+                        "minCount": 1,
+                        "maxCount": 2,
+                        "vmSize": "Standard_B4ms",
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks",
+                        "type": "VirtualMachineScaleSets",
+                        "mode": "System",
+                        "maxPods": 110,
+                        "availabilityZones": [],
+                        "nodeTaints": [],
+                        "enableNodePublicIP": false,
+                        "tags": {}
+                    }
+                ],
+                "networkProfile": {
+                    "loadBalancerSku": "standard",
+                    "networkPlugin": "kubenet"
+                },
+                "autoUpgradeProfile": {
+                    "upgradeChannel": "patch"
+                },
+                "disableLocalAccounts": false,
+                "apiServerAccessProfile": {
+                    "enablePrivateCluster": false
+                },
+                "addonProfiles": {
+                    "azurepolicy": {
+                        "enabled": false
+                    },
+                    "azureKeyvaultSecretsProvider": {
+                        "enabled": false,
+                        "config": null
+                    }
+                }
+            },
+            "tags": {},
+            "sku": {
+                "name": "Basic",
+                "tier": "Free"
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            }
+        }
+    ],
+    "outputs": {
+        "clusterName": {
+            "type": "string",
+            "value": "[variables('clusterName')]"
+        },
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.ContainerService/managedClusters/', variables('clusterName'))).fqdn]"
+        }
+    }
+}

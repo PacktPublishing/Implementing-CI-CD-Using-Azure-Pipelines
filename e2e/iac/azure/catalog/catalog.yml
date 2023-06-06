@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: packt-store-catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: packt-store-catalog
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: packt-store-catalog
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: packt-store-catalog
+        image: packtadocicd.azurecr.io/packt-store-catalog:latest
+        ports:
+        - containerPort: 5050
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: packt-store-catalog
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5050
+  selector:
+    app: packt-store-catalog
