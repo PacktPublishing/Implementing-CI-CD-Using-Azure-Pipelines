@@ -1,0 +1,19 @@
+parameters:
+  - name: envName
+    type: string
+    default: 'test'
+  - name: azureSubscription
+    type: string
+    default: 'azure-packt-rg'
+
+jobs:
+- deployment: Deploy ${{ parameters.envName }} 
+  displayName: Deploy to ${{ parameters.envName }}
+  environment: ${{ parameters.envName }}
+  strategy: 
+    runOnce:
+      deploy:
+        steps:
+        - script: echo my first deployment
+
+# kubectl get service packt-store-catalog -o json | jq ".status.loadBalancer.ingress[0].ip"
