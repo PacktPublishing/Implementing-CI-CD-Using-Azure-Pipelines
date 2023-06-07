@@ -2,5 +2,8 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "python.formatting.provider": "none"
+    "python.formatting.provider": "none",
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/microsoft/azure-pipelines-vscode/master/service-schema.json": "file:///c%3A/Users/rmard/source/GitHub/PackPublishing/Implementing-CI-CD-Using-Azure-Pipelines/e2e/iac/azure/deploy.yml"
+    }
 }
