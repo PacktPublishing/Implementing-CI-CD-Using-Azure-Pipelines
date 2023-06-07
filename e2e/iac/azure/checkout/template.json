@@ -13,6 +13,10 @@
         "registryName": {
             "type": "string",
             "defaultValue": "packtadocicd"
+        },
+        "containerTag": {
+            "type": "string",
+            "defaultValue": "latest"
         }
     },
     "variables": {
@@ -32,7 +36,7 @@
                     {
                         "name": "[variables('containerName')]",
                         "properties": {
-                            "image": "packtadocicd.azurecr.io/packt-store-checkout:latest",
+                            "image": "[concat(parameters('registryName'), '.azurecr.io/packt-store-checkout:', parameters('containerTag'))]",
                             "environmentVariables": [
                                 {
                                     "name": "ASPNETCORE_URLS",

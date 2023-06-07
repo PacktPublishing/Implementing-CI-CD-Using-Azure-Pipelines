@@ -13,6 +13,10 @@
         "registryName": {
             "type": "string",
             "defaultValue": "packtadocicd"
+        },
+        "containerTag": {
+            "type": "string",
+            "defaultValue": "latest"
         }
     },
     "variables": {
@@ -100,8 +104,8 @@
                     ],
                     "registries": [
                         {
-                            "server": "packtadocicd.azurecr.io",
-                            "username": "packtadocicd",
+                            "server": "[concat(parameters('registryName'), '.azurecr.io')]",
+                            "username": "[parameters('registryName')]",
                             "passwordSecretRef": "packt-registry-secret"
                         }
                     ],
@@ -120,7 +124,7 @@
                     "containers": [
                         {
                             "name": "cart",
-                            "image": "packtadocicd.azurecr.io/packt-store-cart:latest",
+                            "image": "[concat(parameters('registryName'), '.azurecr.io/packt-store-cart:', parameters('containerTag'))]",
                             "command": [],
                             "resources": {
                                 "cpu": 1,
