@@ -11,7 +11,7 @@ jobs:
   displayName: Build and Push Containers
   steps:
   - task: DockerCompose@0
-    displayName: 'Build Application Containers'
+    displayName: 'Build Containers'
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: ${{parameters.azureSubscription}}
@@ -22,7 +22,7 @@ jobs:
       additionalImageTags: '$(Build.BuildNumber)'
       includeLatestTag: true
   - task: DockerCompose@0
-    displayName: 'Push Application Containers'
+    displayName: 'Push Containers'
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: ${{parameters.azureSubscription}}
