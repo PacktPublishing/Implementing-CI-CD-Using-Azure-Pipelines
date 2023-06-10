@@ -158,7 +158,7 @@
         }
     ],
     "outputs": {
-        "containerAppUrl": {
+        "containerAppFqdn": {
             "type": "string",
             "value": "[reference(resourceId('Microsoft.App/containerapps', variables('containerAppName'))).configuration.ingress.fqdn]"
         }
