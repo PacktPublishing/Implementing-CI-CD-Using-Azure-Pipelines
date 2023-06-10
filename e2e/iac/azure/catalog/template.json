@@ -28,10 +28,6 @@
                 "description": "The unique id used in the role assignment of the kubernetes service to the container registry service. It is recommended to use the default value."
             },
             "defaultValue": "[newGuid()]"
-        },
-        "containerTag": {
-            "type": "string",
-            "defaultValue": "latest"
         }
     },
     "variables": {
