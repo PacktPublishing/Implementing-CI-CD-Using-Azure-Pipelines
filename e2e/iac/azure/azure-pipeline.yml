@@ -25,4 +25,3 @@ stages:
   - template: deploy.yml
     parameters:
       envName: production
-
