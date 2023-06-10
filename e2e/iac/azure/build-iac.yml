@@ -1,0 +1,94 @@
+parameters:
+- name: azureSubscription
+  type: string
+  default: 'azure-packt-rg'
+- name: resourceGroupName
+  type: string
+  default: 'packt'
+- name: location
+  type: string
+  default: 'East US'
+
+jobs:
+- job: VerifyAndPackageIaC
+  displayName: Verify and Package IaC
+  steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Validate Catalog Template'
+      inputs:
+        deploymentScope: 'Resource Group' 
+        azureResourceManagerConnection: ${{parameters.azureSubscription}}
+        resourceGroupName: ${{parameters.resourceGroupName}}
+        templateLocation: 'Linked artifact'
+        csmFile: 'e2e/iac/azure/catalog/template.json'
+        deploymentMode: 'Validation'
+        location: ${{parameters.location}}
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Catalog Artifacts'
+      inputs:
+        targetPath: 'e2e/iac/azure/catalog'
+        artifact: catalog-iac
+        publishLocation: 'pipeline'
+    - task: HelmInstaller@1
+      displayName: 'Install Helm'
+    - task: HelmDeploy@0
+      displayName: 'Package Catalog Helm Chart'
+      inputs:
+        command: package
+        chartPath: e2e/iac/helm-charts/catalog
+        destination: $(Build.ArtifactStagingDirectory)
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Catalog Helm Chart'
+      inputs:
+        targetPath: $(Build.ArtifactStagingDirectory)
+        artifact: catalog-helm-chart
+        publishLocation: 'pipeline'
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Validate Cart Template'
+      inputs:
+        deploymentScope: 'Resource Group' 
+        azureResourceManagerConnection: ${{parameters.azureSubscription}}
+        resourceGroupName: ${{parameters.resourceGroupName}}
+        templateLocation: 'Linked artifact'
+        csmFile: 'e2e/iac/azure/cart/template.json'
+        deploymentMode: 'Validation'
+        location: ${{parameters.location}}
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Cart Artifacts'
+      inputs:
+        targetPath: 'e2e/iac/azure/cart'
+        artifact: cart-iac
+        publishLocation: 'pipeline'
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Validate Checkout Template'
+      inputs:
+        deploymentScope: 'Resource Group' 
+        azureResourceManagerConnection: ${{parameters.azureSubscription}}
+        resourceGroupName: ${{parameters.resourceGroupName}}
+        templateLocation: 'Linked artifact'
+        csmFile: 'e2e/iac/azure/checkout/template.json'
+        deploymentMode: 'Validation'
+        location: ${{parameters.location}}
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Checkout Artifacts'
+      inputs:
+        targetPath: 'e2e/iac/azure/checkout'
+        artifact: checkout-iac
+        publishLocation: 'pipeline'
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Validate Frontend Template'
+      inputs:
+        deploymentScope: 'Resource Group' 
+        azureResourceManagerConnection: ${{parameters.azureSubscription}}
+        resourceGroupName: ${{parameters.resourceGroupName}}
+        templateLocation: 'Linked artifact'
+        csmFile: 'e2e/iac/azure/frontend/template.json'
+        deploymentMode: 'Validation'
+        location: ${{parameters.location}}
+        overrideParameters: '-catalogAppUrl catalogAppUrl.com -cartAppUrl cartAppUrl.com -checkoutAppUrl checkoutAppUrl.com'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Frontend Artifacts'
+      inputs:
+        targetPath: 'e2e/iac/azure/frontend'
+        artifact: frontend-iac
+        publishLocation: 'pipeline'

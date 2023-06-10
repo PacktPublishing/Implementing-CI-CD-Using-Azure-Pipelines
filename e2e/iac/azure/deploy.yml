@@ -1,19 +1,78 @@
 parameters:
-  - name: envName
-    type: string
-    default: 'test'
-  - name: azureSubscription
-    type: string
-    default: 'azure-packt-rg'
+- name: envName
+  type: string
+  default: 'test'
+- name: azureSubscription
+  type: string
+  default: 'azure-packt-rg'
+- name: resourceGroupName
+  type: string
+  default: 'packt'
+- name: location
+  type: string
+  default: 'East US'
 
 jobs:
-- deployment: Deploy ${{ parameters.envName }} 
+- deployment: deployment_${{ parameters.envName }} 
   displayName: Deploy to ${{ parameters.envName }}
   environment: ${{ parameters.envName }}
   strategy: 
     runOnce:
       deploy:
         steps:
-        - script: echo my first deployment
+        - download: current
+          displayName: 'Download catalog iac'
+          artifact: catalog-iac
+        - task: AzureResourceGroupDeployment@2
+          name: catalogInfra
+          displayName: 'Deploy catalog Infra'
+          inputs:
+            azureSubscription: ${{ parameters.azureSubscription }} 
+            action: 'Create Or Update Resource Group' 
+            resourceGroupName: ${{ parameters.resourceGroupName }}
+            location: ${{ parameters.location }}
+            templateLocation: 'Linked artifact'
+            csmFile: '$(Pipeline.Workspace)/catalog-iac/template.json'
+            overrideParameters: '-environmentName ${{ parameters.envName }}'
+            deploymentMode: 'Incremental'
+            deploymentName: 'catalog-$(Build.BuildNumber)'
+        - download: current
+          displayName: 'Download catalog helm chart'
+          artifact: catalog-helm-chart
+        - download: current
+          displayName: 'Download cart iac'
+          artifact: cart-iac
+        - task: AzureResourceGroupDeployment@2
+          name: cartInfra
+          displayName: 'Deploy cart Infra'
+          inputs:
+            azureSubscription: ${{ parameters.azureSubscription }} 
+            action: 'Create Or Update Resource Group' 
+            resourceGroupName: ${{ parameters.resourceGroupName }}
+            location: ${{ parameters.location }}
+            templateLocation: 'Linked artifact'
+            csmFile: '$(Pipeline.Workspace)/cart-iac/template.json'
+            overrideParameters: '-environmentName ${{ parameters.envName }}'
+            deploymentMode: 'Incremental'
+            deploymentName: 'cart-$(Build.BuildNumber)'
+        - download: current
+          displayName: 'Download checkout iac'
+          artifact: checkout-iac
+        - task: AzureResourceGroupDeployment@2
+          name: checkoutInfra
+          displayName: 'Deploy checkout Infra'
+          inputs:
+            azureSubscription: ${{ parameters.azureSubscription }} 
+            action: 'Create Or Update Resource Group' 
+            resourceGroupName: ${{ parameters.resourceGroupName }}
+            location: ${{ parameters.location }}
+            templateLocation: 'Linked artifact'
+            csmFile: '$(Pipeline.Workspace)/checkout-iac/template.json'
+            overrideParameters: '-environmentName ${{ parameters.envName }}'
+            deploymentMode: 'Incremental'
+            deploymentName: 'checkout-$(Build.BuildNumber)'
+        - download: current
+          displayName: 'Download frontend iac'
+          artifact: frontend-iac
 
 # kubectl get service packt-store-catalog -o json | jq ".status.loadBalancer.ingress[0].ip"

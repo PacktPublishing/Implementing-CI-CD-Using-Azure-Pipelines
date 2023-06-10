@@ -1,0 +1,32 @@
+parameters:
+- name: azureSubscription
+  type: string
+  default: 'azure-packt-rg'
+- name: azureContainerRegistry
+  type: string
+  default: '{"loginServer":"packtadocicd.azurecr.io", "id" : "/subscriptions/f087e49e-91bd-45f5-b53d-2b190dcfe21d/resourceGroups/packt/providers/Microsoft.ContainerRegistry/registries/packtadocicd"}'
+
+jobs:
+- job: BuildAndPushContainers
+  displayName: Build and Push Containers
+  steps:
+  - task: DockerCompose@0
+    inputs:
+      containerregistrytype: 'Azure Container Registry'
+      azureSubscription: ${{parameters.azureSubscription}}
+      azureContainerRegistry: ${{parameters.azureContainerRegistry}}
+      dockerComposeFile: 'docker-compose.yml'
+      projectName: 'packt-store'
+      action: 'Build services'
+      additionalImageTags: '$(Build.BuildNumber)'
+      includeLatestTag: true
+  - task: DockerCompose@0
+    inputs:
+      containerregistrytype: 'Azure Container Registry'
+      azureSubscription: ${{parameters.azureSubscription}}
+      azureContainerRegistry: ${{parameters.azureContainerRegistry}}
+      dockerComposeFile: 'docker-compose.yml'
+      projectName: 'packt-store'
+      action: 'Push services'
+      additionalImageTags: '$(Build.BuildNumber)'
+      includeLatestTag: true
