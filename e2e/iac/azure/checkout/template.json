@@ -104,5 +104,11 @@
             },
             "tags": {}
         }
-    ]
+    ],
+    "outputs": {
+        "containerFQDN": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups', variables('containerName'))).ipAddress.fqdn]"
+        }
+    }
 }
