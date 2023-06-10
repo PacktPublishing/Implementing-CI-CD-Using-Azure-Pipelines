@@ -39,6 +39,16 @@ jobs:
         - download: current
           displayName: 'Download catalog helm chart'
           artifact: catalog-helm-chart
+        - task: HelmInstaller@1
+          displayName: 'Install Helm'
+        - task: HelmDeploy@0
+          displayName: Deploy Catalog App to AKS
+          inputs:
+            connectionType: Azure Resource Manager
+            azureSubscriptionEndpoint: ${{ parameters.azureSubscription }} 
+            azureResourceGroup: ${{ parameters.resourceGroupName }}
+            kubernetesCluster: $(catalogInfra.clusterName)
+            chartPath: catalog-helm-chart/*.tgz
         - download: current
           displayName: 'Download cart iac'
           artifact: cart-iac
