@@ -60,15 +60,15 @@
                         },
                         {
                             "name": "CATALOG_API_URL",
-                            "value": "[concat('http://', parameters('catalogAppUrl'), '/')]"
+                            "value": "[parameters('catalogAppUrl')]"
                         },
                         {
                             "name": "CART_API_URL",
-                            "value": "[concat('http://', parameters('cartAppUrl'), '/')]"
+                            "value": "[parameters('cartAppUrl')]"
                         },
                         {
                             "name": "CHECKOUT_API_URL",
-                            "value": "[concat('http://', parameters('checkoutAppUrl'),'/')]"
+                            "value": "[parameters('checkoutAppUrl')]"
                         }
                     ],
                     "linuxFxVersion": "DOCKER|packtadocicd.azurecr.io/packt-store-frontend:latest",
