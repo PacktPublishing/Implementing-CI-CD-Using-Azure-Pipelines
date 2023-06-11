@@ -103,8 +103,8 @@
                 "zoneRedundant": false
             },
             "sku": {
-                "Tier": "Free",
-                "Name": "F1"
+                "Tier": "Basic",
+                "Name": "B1"
             }
         }
     ],
