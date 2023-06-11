@@ -150,3 +150,13 @@ jobs:
             deploymentMode: 'Incremental'
             deploymentName: 'frontend-$(Build.BuildNumber)'
             deploymentOutputs: 'frontendInfraOutputs'
+        - task: PowerShell@2
+          displayName: 'Get Frontend URL'
+          inputs:
+            targetType: 'inline'
+            script: |
+              # Get the frontend app url
+              $var=ConvertFrom-Json '$(frontendInfraOutputs)'
+              $value=$var.frontendUrl.value
+              Write-Host "Frontend Url: $value"
+              Write-Host "##vso[task.setvariable variable=frontendAppUrl;]$value"
