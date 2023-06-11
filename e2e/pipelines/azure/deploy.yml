@@ -112,17 +112,17 @@ jobs:
             inlineScript: |
               az aks get-credentials -g ${{ parameters.resourceGroupName }} -n $(clusterName) --overwrite-existing
               ip=`kubectl get service catalog-packt-store-catalog -o json | jq ".status.loadBalancer.ingress[0].ip"`
-              echo "Cart App Url: $ip"
-              echo "##vso[task.setvariable variable=cartAppIp;]$ip"
+              echo "Catalog App IP: $ip"
+              echo "##vso[task.setvariable variable=catalogAppIp;]$ip"
         - task: PowerShell@2
           displayName: 'Set App URLs'
           inputs:
             targetType: 'inline'
             script: |
               # Set the catalog app url
-              $value="http://" + $(cartAppIp) + ":5050/"
-              Write-Host "Cart App Url: $value"
-              Write-Host "##vso[task.setvariable variable=cartAppUrl;]$value"
+              $value="http://" + $(catalogAppIp) + ":5050/"
+              Write-Host "Catalog App Url: $value"
+              Write-Host "##vso[task.setvariable variable=catalogAppUrl;]$value"
 
               # Set the cart app url
               $var=ConvertFrom-Json '$(cartInfraOutputs)'
