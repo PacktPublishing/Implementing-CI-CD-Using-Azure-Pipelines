@@ -63,8 +63,10 @@ jobs:
             releaseName: catalog
             chartType: FilePath
             chartPath: "$(Pipeline.Workspace)/catalog-helm-chart/packt-store-catalog-1.0.0.tgz"
+            overrideValues: 'image.tag=$(Build.BuildNumber)'
             command: upgrade
             install: true
+            recreate: true
             waitForExecution: true
         - download: current
           displayName: 'Download cart iac'
@@ -79,7 +81,7 @@ jobs:
             location: ${{ parameters.location }}
             templateLocation: 'Linked artifact'
             csmFile: '$(Pipeline.Workspace)/cart-iac/template.json'
-            overrideParameters: '-environmentName ${{ parameters.envName }}'
+            overrideParameters: '-environmentName ${{ parameters.envName }} -containerTag "$(Build.BuildNumber)"'
             deploymentMode: 'Incremental'
             deploymentName: 'cart-$(Build.BuildNumber)'
             deploymentOutputs: 'cartInfraOutputs'
@@ -96,7 +98,7 @@ jobs:
             location: ${{ parameters.location }}
             templateLocation: 'Linked artifact'
             csmFile: '$(Pipeline.Workspace)/checkout-iac/template.json'
-            overrideParameters: '-environmentName ${{ parameters.envName }}'
+            overrideParameters: '-environmentName ${{ parameters.envName }} -containerTag "$(Build.BuildNumber)"'
             deploymentMode: 'Incremental'
             deploymentName: 'checkout-$(Build.BuildNumber)'
             deploymentOutputs: 'checkoutInfraOutputs'
@@ -146,7 +148,7 @@ jobs:
             location: ${{ parameters.location }}
             templateLocation: 'Linked artifact'
             csmFile: '$(Pipeline.Workspace)/frontend-iac/template.json'
-            overrideParameters: '-environmentName ${{ parameters.envName }} -catalogAppUrl $(catalogAppUrl) -cartAppUrl $(cartAppUrl) -checkoutAppUrl $(checkoutAppUrl)'
+            overrideParameters: '-environmentName ${{ parameters.envName }} -containerTag "$(Build.BuildNumber)" -catalogAppUrl $(catalogAppUrl) -cartAppUrl $(cartAppUrl) -checkoutAppUrl $(checkoutAppUrl)'
             deploymentMode: 'Incremental'
             deploymentName: 'frontend-$(Build.BuildNumber)'
             deploymentOutputs: 'frontendInfraOutputs'
