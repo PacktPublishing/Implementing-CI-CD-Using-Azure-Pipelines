@@ -73,7 +73,7 @@
                     {
                         "name": "agentpool",
                         "osDiskSizeGB": 0,
-                        "count": 3,
+                        "count": 1,
                         "enableAutoScaling": true,
                         "minCount": 1,
                         "maxCount": 2,
