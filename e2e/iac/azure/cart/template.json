@@ -160,7 +160,7 @@
     "outputs": {
         "containerAppFqdn": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.App/containerapps', variables('containerAppName'))).configuration.ingress.fqdn]"
+            "value": "[reference(resourceId('Microsoft.App/containerapps', variables('containerAppName'))).latestRevisionFqdn]"
         }
     }
 }
