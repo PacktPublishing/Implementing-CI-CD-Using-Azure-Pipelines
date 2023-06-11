@@ -127,7 +127,7 @@ jobs:
               # Set the cart app url
               $var=ConvertFrom-Json '$(cartInfraOutputs)'
               $value=$var.containerAppFqdn.value
-              $value="http://" + $var.containerAppFqdn.value + ":5075/"
+              $value="https://" + $var.containerAppFqdn.value + "/"
               Write-Host "Cart App Url: $value"
               Write-Host "##vso[task.setvariable variable=cartAppUrl;]$value"
 
