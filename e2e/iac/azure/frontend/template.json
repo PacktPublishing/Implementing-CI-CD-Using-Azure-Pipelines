@@ -14,6 +14,10 @@
             "type": "string",
             "defaultValue": "packtadocicd"
         },
+        "containerTag": {
+            "type": "string",
+            "defaultValue": "latest"
+        },
         "catalogAppUrl": {
             "type": "string"
         },
@@ -71,7 +75,7 @@
                             "value": "[parameters('checkoutAppUrl')]"
                         }
                     ],
-                    "linuxFxVersion": "DOCKER|packtadocicd.azurecr.io/packt-store-frontend:latest",
+                    "linuxFxVersion": "[concat('DOCKER|packtadocicd.azurecr.io/packt-store-frontend:',parameters('containerTag'))]",
                     "alwaysOn": false,
                     "ftpsState": "FtpsOnly"
                 },
