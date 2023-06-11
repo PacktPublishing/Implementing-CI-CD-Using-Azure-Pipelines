@@ -78,7 +78,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('planName'))]",
                 "clientAffinityEnabled": false,
                 "virtualNetworkSubnetId": null,
-                "httpsOnly": true,
+                "httpsOnly": false,
                 "publicNetworkAccess": "Enabled"
             }
         },
@@ -107,7 +107,7 @@
     "outputs": {
         "frontendUrl": {
             "type": "string",
-            "value": "[concat('https://', variables('appName'), '.azurewebsites.net')]"
+            "value": "[concat('http://', variables('appName'), '.azurewebsites.net')]"
         }
     }
 }
