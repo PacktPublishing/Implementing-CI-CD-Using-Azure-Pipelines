@@ -5,6 +5,11 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
 
 app = Flask(__name__)
+
+app.config["SWAGGER"] = {
+    "title": "Packt Store Catalog"
+}
+
 CORS(app)
 
 @app.route('/', methods=['GET'])
