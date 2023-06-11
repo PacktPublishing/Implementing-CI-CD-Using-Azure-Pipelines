@@ -29,6 +29,10 @@ jobs:
         targetPath: 'e2e/iac/azure/catalog'
         artifact: catalog-iac
         publishLocation: 'pipeline'
+    - script: |
+        docker run --rm -v $(pwd):/manifests stackrox/kube-linter lint /manifests --config /manifests/.kube-linter.yml
+      displayName: 'Lint Catalog Helm Chart'
+      workingDirectory: e2e/iac/helm-charts/catalog
     - task: HelmInstaller@1
       displayName: 'Install Helm'
     - task: HelmDeploy@0
