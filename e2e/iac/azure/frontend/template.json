@@ -25,7 +25,7 @@
         }
     },
     "variables": {
-        "appName": "[concat(parameters('environmentName'), '-packt-store-checkout')]",
+        "appName": "[concat(parameters('environmentName'), '-packt-store-frontend')]",
         "planName": "[concat(variables('appName'), '-plan')]"
     },
     "resources": [
