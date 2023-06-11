@@ -7,12 +7,12 @@ from apispec_webframeworks.flask import FlaskPlugin
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     return redirect('/swagger')
 
 
-@app.route('/health')
+@app.route('/health', methods=['GET'])
 def get_health():
     """
     Health check endpoint
@@ -25,7 +25,7 @@ def get_health():
     return {}, 200
 
 
-@app.route('/products')
+@app.route('/products', methods=['GET'])
 def get_products():
     """
     Get products
