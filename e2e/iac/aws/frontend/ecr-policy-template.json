@@ -1,0 +1,13 @@
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowLightsailPull-ecr-private-repo-demo",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "IamRolePrincipalArn"
+      },
+      "Action": ["ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer"]
+    }
+  ]
+}

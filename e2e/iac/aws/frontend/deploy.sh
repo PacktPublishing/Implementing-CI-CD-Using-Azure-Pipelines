@@ -12,9 +12,11 @@ echo "Waiting for container service to be ready..."
 sleep 30 
 echo "Retrieving container service private registry principal ARN..."
 principal_arn=`aws lightsail get-container-services --service-name $2-$1-frontend --region $3 --query "containerServices[0].privateRegistryAccess.ecrImagePullerRole.principalArn" --output text`
+echo "Principal ARN: $principal_arn"
 # Aply ECR policy
 echo "Applying ECR policy..."
-sed "s/IamRolePrincipalArn/${principal_arn}/g" ecr-policy-template.json > ecr-policy.json
+sed "s/IamRolePrincipalArn/$principal_arn/g" ecr-policy-template.json > ecr-policy.json
+cat ecr-policy.json
 aws ecr set-repository-policy --repository-name $3 --policy-text file://ecr-policy.json
 # Create Deployment
 account_id=`aws sts get-caller-identity --query "Account" --output text`
