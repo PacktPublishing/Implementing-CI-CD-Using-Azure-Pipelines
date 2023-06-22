@@ -69,4 +69,16 @@ jobs:
               sed "s|AWSACCOUNTID|$account_id|g ; s|AWSREGION|$3|g ; s|REPO_NAME|$4|g ; s|CONTAINERTAG|$5|g ; s|CATALOG_API_URL_VALUE|$6|g ; s|CART_API_URL_VALUE|$7|g ; s|CHECKOUT_API_URL_VALUE|$8|g" deployment-template.json > deployment.json
               echo "Creating deployment..."
               aws lightsail create-container-service-deployment --service-name $2-$1-frontend --region $3 --cli-input-json file://deployment.json
-              echo "Deployment created successfully!"            
+              state="DEPLOYING"
+              until [ "$state" != "DEPLOYING" ]
+              do
+                  sleep 5
+                  state=`aws lightsail get-container-services --service-name $2-$1-frontend --region $3 --query "containerServices[0].state" --output text`
+              done
+              if [ "$state" == "RUNNING" ]
+              then
+                  echo "Deployment created successfully!"
+              else
+                  echo "Deployment failed!"
+                  exit 1
+              fi
