@@ -9,9 +9,12 @@ echo "CART_API_URL_VALUE: $7"
 echo "CHECKOUT_API_URL_VALUE: $8"
 aws lightsail update-container-service --service-name $2-$1-frontend --region $3 --private-registry-access ecrImagePullerRole={isActive=true}
 echo "Waiting for container service to be ready..."
-sleep 30
-echo "Retrieving container service private registry principal ARN..."
-principal_arn=`aws lightsail get-container-services --service-name $2-$1-frontend --region $3 --query "containerServices[0].privateRegistryAccess.ecrImagePullerRole.principalArn" --output text`
+principal_arn=""
+until [ "$principal_arn" != "" ]
+do
+    sleep 5
+    principal_arn=`aws lightsail get-container-services --service-name $2-$1-frontend --region $3 --query "containerServices[0].privateRegistryAccess.ecrImagePullerRole.principalArn" --output text`
+done
 echo "Principal ARN: $principal_arn"
 # Aply ECR policy
 echo "Applying ECR policy..."
