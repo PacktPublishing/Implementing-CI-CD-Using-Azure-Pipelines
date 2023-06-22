@@ -1,0 +1,28 @@
+{
+  "serviceName": "frontend",
+  "containers": {
+    "frontend": {
+      "image": "AWSACCOUNTID.dkr.ecr.AWSREGION.amazonaws.com/REPO_NAME:CONTAINERTAG",
+      "environment": {
+        "CATALOG_API_URL": "CATALOG_API_URL_VALUE",
+        "CART_API_URL": "CART_API_URL_VALUE",
+        "CHECKOUT_API_URL": "CHECKOUT_API_URL_VALUE"
+      },
+      "ports": {
+        "80": "HTTP"
+      }
+    }
+  },
+  "publicEndpoint": {
+    "containerName": "frontend",
+    "containerPort": 80,
+    "healthCheck": {
+      "healthyThreshold": 2,
+      "intervalSeconds": 30,
+      "path": "/",
+      "successCodes": 200,
+      "timeoutSeconds": 5,
+      "unhealthyThreshold": 2
+    }
+  }
+}

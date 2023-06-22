@@ -1,0 +1,38 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS CloudFormation template for the frontend service",
+  "Parameters": {
+    "EnvironmentName": {
+      "Type": "String",
+      "Default": "test",
+      "AllowedValues": ["test", "production"],
+      "Description": "Environment name"
+    }
+  },
+  "Resources": {
+    "FrontendContainer": {
+      "Type": "AWS::Lightsail::Container",
+      "Properties": {
+        "IsDisabled": false,
+        "Power": "nano",
+        "Scale": 1,
+        "ServiceName": {
+          "Fn::Join": [
+            "-",
+            [
+              { "Ref": "AWS::StackName" },
+              { "Ref": "EnvironmentName" },
+              "frontend"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "URL": {
+      "Description": "URL of the frontend service",
+      "Value": { "Ref": "FrontendContainer" }
+    }
+  }
+}
