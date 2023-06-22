@@ -1,0 +1,93 @@
+parameters:
+- name: awsConnection
+  type: string
+  default: 'aws-packt'
+- name: resourceGroupName
+  type: string
+  default: 'packt'
+- name: region
+  type: string
+  default: 'us-east-1'
+
+jobs:
+- job: VerifyAndPackageIaC
+  displayName: Verify and Package IaC
+  steps:
+    # - task: AWSCLI@1
+    #   displayName: 'Validate CloudFormation catalog'
+    #   inputs:
+    #       awsCredentials: ${{parameters.awsConnection}}
+    #       regionName: ${{parameters.region}}
+    #       awsCommand: 'cloudformation'
+    #       awsSubCommand: 'validate-template'
+    #       awsArguments: '--template-body file://template.json'
+    #       workingDirectory: 'e2e/iac/aws/catalog'
+    # - task: PublishPipelineArtifact@1
+    #   displayName: 'Publish Artifacts catalog'
+    #   inputs:
+    #     targetPath: 'e2e/iac/aws/catalog'
+    #     artifact: catalog-iac
+    #     publishLocation: 'pipeline'
+    # - script: |
+    #     docker run --rm -v $(pwd):/manifests stackrox/kube-linter lint /manifests --config /manifests/.kube-linter.yml
+    #   displayName: 'Lint Catalog Helm Chart'
+    #   workingDirectory: e2e/iac/helm-charts/catalog
+    # - task: HelmInstaller@1
+    #   displayName: 'Install Helm'
+    # - task: HelmDeploy@0
+    #   displayName: 'Package Catalog Helm Chart'
+    #   inputs:
+    #     command: package
+    #     chartPath: e2e/iac/helm-charts/catalog
+    #     destination: $(Build.ArtifactStagingDirectory)
+    # - task: PublishPipelineArtifact@1
+    #   displayName: 'Publish Catalog Helm Chart'
+    #   inputs:
+    #     targetPath: $(Build.ArtifactStagingDirectory)
+    #     artifact: catalog-helm-chart
+    #     publishLocation: 'pipeline'
+    # - task: AWSCLI@1
+    #   displayName: 'Validate CloudFormation cart'
+    #   inputs:
+    #       awsCredentials: ${{parameters.awsConnection}}
+    #       regionName: ${{parameters.region}}
+    #       awsCommand: 'cloudformation'
+    #       awsSubCommand: 'validate-template'
+    #       awsArguments: '--template-body file://template.json'
+    #       workingDirectory: 'e2e/iac/aws/cart'
+    # - task: PublishPipelineArtifact@1
+    #   displayName: 'Publish Artifacts cart'
+    #   inputs:
+    #     targetPath: 'e2e/iac/aws/cart'
+    #     artifact: cart-iac
+    #     publishLocation: 'pipeline'
+    # - task: AWSCLI@1
+    #   displayName: 'Validate CloudFormation checkout'
+    #   inputs:
+    #       awsCredentials: ${{parameters.awsConnection}}
+    #       regionName: ${{parameters.region}}
+    #       awsCommand: 'cloudformation'
+    #       awsSubCommand: 'validate-template'
+    #       awsArguments: '--template-body file://template.json'
+    #       workingDirectory: 'e2e/iac/aws/checkout'
+    # - task: PublishPipelineArtifact@1
+    #   displayName: 'Publish Artifacts checkout'
+    #   inputs:
+    #     targetPath: 'e2e/iac/aws/checkout'
+    #     artifact: checkout-iac
+    #     publishLocation: 'pipeline'
+    # - task: AWSCLI@1
+    #   displayName: 'Validate CloudFormation frontend'
+    #   inputs:
+    #       awsCredentials: ${{parameters.awsConnection}}
+    #       regionName: ${{parameters.region}}
+    #       awsCommand: 'cloudformation'
+    #       awsSubCommand: 'validate-template'
+    #       awsArguments: '--template-body file://template.json'
+    #       workingDirectory: 'e2e/iac/aws/frontend'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifacts frontend'
+      inputs:
+        targetPath: 'e2e/iac/aws/frontend'
+        artifact: frontend-iac
+        publishLocation: 'pipeline'

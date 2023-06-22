@@ -1,0 +1,29 @@
+parameters:
+- name: awsRegistry
+  type: string
+  default: 'aws-ecr'
+
+jobs:
+- job: BuildAndPushContainers
+  displayName: Build and Push Containers
+  steps:
+  - task: DockerCompose@0
+    displayName: 'Build Containers'
+    inputs:
+      containerregistrytype: 'Container Registry'
+      dockerRegistryEndpoint: ${{parameters.awsRegistry}}
+      dockerComposeFile: 'docker-compose.yml'
+      projectName: 'packt-store'
+      action: 'Build services'
+      additionalImageTags: '$(Build.BuildNumber)'
+      includeLatestTag: true
+  - task: DockerCompose@0
+    displayName: 'Push Containers'
+    inputs:
+      containerregistrytype: 'Container Registry'
+      dockerRegistryEndpoint: ${{parameters.awsRegistry}}
+      dockerComposeFile: 'docker-compose.yml'
+      projectName: 'packt-store'
+      action: 'Push services'
+      additionalImageTags: '$(Build.BuildNumber)'
+      includeLatestTag: true

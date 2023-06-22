@@ -1,0 +1,27 @@
+# Multi-Stage pipeline
+trigger:
+- main
+pool:
+  vmImage: ubuntu-latest
+stages:
+- stage: build
+  displayName: Build
+  jobs:
+#  - template: build-apps.yml
+  - template: build-iac.yml
+
+- stage: deployTest
+  displayName: Deploy Test
+  dependsOn: build
+  jobs:
+  - template: deploy.yml
+    parameters:
+      envName: test
+
+# - stage: deployProduction
+#   displayName: Deploy Production
+#   dependsOn: deployTest
+#   jobs:
+#   - template: deploy.yml
+#     parameters:
+#       envName: production
