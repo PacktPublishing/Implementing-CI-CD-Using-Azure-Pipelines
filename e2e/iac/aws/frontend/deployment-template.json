@@ -20,7 +20,7 @@
       "healthyThreshold": 2,
       "intervalSeconds": 30,
       "path": "/",
-      "successCodes": 200,
+      "successCodes": "200-499",
       "timeoutSeconds": 5,
       "unhealthyThreshold": 2
     }

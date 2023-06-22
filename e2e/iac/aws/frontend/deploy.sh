@@ -7,7 +7,7 @@ echo "CONTAINER_TAG: $5"
 echo "CATALOG_API_URL_VALUE: $6"
 echo "CART_API_URL_VALUE: $7"
 echo "CHECKOUT_API_URL_VALUE: $8"
-aws lightsail update-container-service --service-name $2-$1-frontend --region $3 --private-registry-access ecrImagePullerRole={isActive=true}
+aws lightsail update-container-service --service-name $2-$1-frontend --region $3 --private-registry-access file://private-registry-access.json 
 echo "Waiting for container service to be ready..."
 principal_arn=""
 until [ "$principal_arn" != "" ]
