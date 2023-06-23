@@ -8,6 +8,10 @@ parameters:
 - name: location
   type: string
   default: 'us-east-1'
+- name: containerTag
+  type: string
+  default: 'latest'
+  # default: '$(Build.BuildNumber)'
 
 jobs:
 - deployment: deployment_${{ parameters.envName }} 
@@ -36,7 +40,7 @@ jobs:
           inputs:
             awsCredentials: ${{ parameters.awsConnection }}
             regionName: ${{ parameters.location }}
-            arguments: '${{ parameters.envName }} test ${{ parameters.location }} packt-store-frontend $(Build.BuildNumber) http://catalog:5050/ http://cart:5075/ http://checkout:5015/'
+            arguments: '${{ parameters.envName }} test ${{ parameters.location }} packt-store-frontend ${{ parameters.containerTag }} http://catalog:5050/ http://cart:5075/ http://checkout:5015/'
             disableAutoCwd: true
             workingDirectory: '$(Pipeline.Workspace)/frontend-iac'
             failOnStandardError: true
