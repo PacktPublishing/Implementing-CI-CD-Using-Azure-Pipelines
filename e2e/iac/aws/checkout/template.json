@@ -222,34 +222,10 @@
     }
   },
   "Outputs": {
-    "ECSCluster": {
-      "Description": "The created cluster.",
+    "CheckoutUrl": {
+      "Description": "Url of the checkout service",
       "Value": {
-        "Ref": "ECSCluster"
-      }
-    },
-    "ECSTaskDefinition": {
-      "Description": "The created task definition.",
-      "Value": {
-        "Ref": "ECSTaskDefinition"
-      }
-    },
-    "ECSService": {
-      "Description": "The created service.",
-      "Value": {
-        "Ref": "ECSService"
-      }
-    },
-    "LoadBalancer": {
-      "Description": "The created load balancer.",
-      "Value": {
-        "Ref": "LoadBalancer"
-      }
-    },
-    "DnsName": {
-      "Description": "The DNS Name of the created load balancer.",
-      "Value": {
-        "Fn::GetAtt": ["LoadBalancer", "DNSName"]
+        "Fn::Join": ["", ["http://", { "Fn::GetAtt": ["LoadBalancer", "DNSName"] }, "/"]]
       }
     }
   }
