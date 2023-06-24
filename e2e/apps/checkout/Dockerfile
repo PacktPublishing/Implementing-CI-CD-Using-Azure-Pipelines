@@ -1,4 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+RUN apt-get update
+RUN apt-get install -y curl
 WORKDIR /app
 EXPOSE 5015
 
