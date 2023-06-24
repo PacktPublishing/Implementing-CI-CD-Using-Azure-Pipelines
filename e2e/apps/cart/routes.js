@@ -38,6 +38,20 @@ export default function setup(app, redisClient) {
      *   description: Shopping Cart Operations
      */
 
+    /** 
+     * @swagger
+     * /health:
+     *   get:
+     *     description: Returns the health of the service
+     *     tags: [Cart]  
+     *     responses:
+     *       200:
+     *         description: Service working!
+     */
+    app.get('/health', (req, res) => {
+        res.status(200).send();
+    });
+
     /**
      * @swagger
      * /carts:
