@@ -61,30 +61,21 @@ jobs:
     #     targetPath: 'e2e/iac/aws/cart'
     #     artifact: cart-iac
     #     publishLocation: 'pipeline'
-    # - task: AWSCLI@1
-    #   displayName: 'Validate CloudFormation checkout'
-    #   inputs:
-    #       awsCredentials: ${{parameters.awsConnection}}
-    #       regionName: ${{parameters.region}}
-    #       awsCommand: 'cloudformation'
-    #       awsSubCommand: 'validate-template'
-    #       awsArguments: '--template-body file://template.json'
-    #       workingDirectory: 'e2e/iac/aws/checkout'
-    # - task: PublishPipelineArtifact@1
-    #   displayName: 'Publish Artifacts checkout'
-    #   inputs:
-    #     targetPath: 'e2e/iac/aws/checkout'
-    #     artifact: checkout-iac
-    #     publishLocation: 'pipeline'
-    # - task: AWSCLI@1
-    #   displayName: 'Validate CloudFormation frontend'
-    #   inputs:
-    #       awsCredentials: ${{parameters.awsConnection}}
-    #       regionName: ${{parameters.region}}
-    #       awsCommand: 'cloudformation'
-    #       awsSubCommand: 'validate-template'
-    #       awsArguments: '--template-body file://template.json'
-    #       workingDirectory: 'e2e/iac/aws/frontend'
+
+    - task: AWSCLI@1
+      displayName: 'Validate CloudFormation checkout'
+      inputs:
+          awsCredentials: ${{parameters.awsConnection}}
+          regionName: ${{parameters.region}}
+          awsCommand: 'cloudformation'
+          awsSubCommand: 'validate-template'
+          awsArguments: '--template-body file://e2e/iac/aws/checkout/template.json'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifacts checkout'
+      inputs:
+        targetPath: 'e2e/iac/aws/checkout'
+        artifact: checkout-iac
+        publishLocation: 'pipeline'
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifacts frontend'
       inputs:
