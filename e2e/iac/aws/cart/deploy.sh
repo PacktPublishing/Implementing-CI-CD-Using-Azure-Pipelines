@@ -18,7 +18,7 @@ sed "s|IamRolePrincipalArn|$principal_arn|g" ecr-policy-template.json > ecr-poli
 aws ecr set-repository-policy --repository-name packt-store-cart --policy-text file://ecr-policy.json
 # Create Deployment
 account_id=`aws sts get-caller-identity --query "Account" --output text`
-sed "s|SERVICENAME|$1|g ; s|AWSACCOUNTID|$account_id|g ; s|AWSREGION|$2|g ; s|CONTAINERTAG|$4|g" deployment-template.json > deployment.json
+sed "s|SERVICENAME|$1|g ; s|AWSACCOUNTID|$account_id|g ; s|AWSREGION|$2|g ; s|CONTAINERTAG|$3|g" deployment-template.json > deployment.json
 echo "Creating deployment..."
 aws lightsail create-container-service-deployment --service-name $1 --region $2 --cli-input-json file://deployment.json
 state="DEPLOYING"
