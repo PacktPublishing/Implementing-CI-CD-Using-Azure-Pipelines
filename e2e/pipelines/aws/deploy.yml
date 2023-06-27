@@ -22,6 +22,22 @@ jobs:
       deploy:
         steps:
         - download: current
+          displayName: 'Download cart iac'
+          artifact: cart-iac
+        - task: CloudFormationCreateOrUpdateStack@1
+          displayName: 'Create cart stack'
+          inputs:
+            awsCredentials: ${{ parameters.awsConnection }}
+            regionName: ${{ parameters.location }}
+            stackName: '${{ parameters.envName }}-cart'
+            templateSource: 'file'
+            templateFile: '$(Pipeline.Workspace)/cart-iac/template.json'
+            templateParametersSource: 'inline'
+            templateParameters: '[{"ParameterKey":"ContainerTag","ParameterValue":"${{ parameters.containerTag }}"}]'
+            onFailure: 'DELETE'
+            captureStackOutputs: 'asVariables'
+            captureAsSecuredVars: false
+        - download: current
           displayName: 'Download checkout iac'
           artifact: checkout-iac
         - task: CloudFormationCreateOrUpdateStack@1
@@ -69,7 +85,7 @@ jobs:
           inputs:
             awsCredentials: ${{ parameters.awsConnection }}
             regionName: ${{ parameters.location }}
-            arguments: '${{ parameters.envName }}-frontend ${{ parameters.location }} packt-store-frontend ${{ parameters.containerTag }} http://catalog:5050/ http://cart:5075/ $(CheckoutUrl)'
+            arguments: '${{ parameters.envName }}-frontend ${{ parameters.location }} packt-store-frontend ${{ parameters.containerTag }} http://catalog:5050/ $(CartUrl) $(CheckoutUrl)'
             disableAutoCwd: true
             workingDirectory: '$(Pipeline.Workspace)/frontend-iac'
             failOnStandardError: true

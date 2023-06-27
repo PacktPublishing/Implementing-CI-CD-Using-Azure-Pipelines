@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Creates the Elastic Container Service Cluster for the checkout service.",
+  "Description": "Creates the Elastic Container Service Cluster for the cart service.",
   "Parameters": {
     "SecurityGroupIDs": {
       "Type": "CommaDelimitedList",
@@ -13,21 +13,6 @@
     "SubnetIDs": {
       "Type": "CommaDelimitedList",
       "Default": "subnet-9049279c,subnet-3e8ac665,subnet-e10150cc,subnet-9dbe35a1,subnet-886e68c1,subnet-897800ec"
-    },
-    "LatestECSOptimizedAMI": {
-      "Description": "AMI ID",
-      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
-      "Default": "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
-    },
-    "UserData": {
-      "Type": "String",
-      "Description": "User data required for Launch Template and Spot Fleet",
-      "Default": "#!/bin/bash \necho ECS_CLUSTER=test-checkout >> /etc/ecs/ecs.config;"
-    },
-    "IamRoleInstanceProfile": {
-      "Type": "String",
-      "Description": "Specifies the Name or the Amazon Resource Name (ARN) of the instance profile associated with the IAM role for the instance",
-      "Default": "arn:aws:iam::643152877624:instance-profile/ecsInstanceRole"
     },
     "ContainerTag": {
       "Type": "String",
@@ -52,20 +37,19 @@
           }
         },
         "ServiceConnectDefaults": {
-          "Namespace": "default"
+          "Namespace": "cluster"
         },
         "Tags": []
       }
     },
     "ECSTaskDefinition": {
       "Type": "AWS::ECS::TaskDefinition",
-      "DependsOn": "EC2CapacityProvider",
       "Properties": {
         "ContainerDefinitions": [
           {
             "Essential": true,
             "HealthCheck": {
-              "Command": ["curl", "-f", "http://localhost:5015/health"],
+              "Command": ["curl", "-f", "http://localhost:5075/health"],
               "Interval": 30,
               "Retries": 3,
               "StartPeriod": 30,
@@ -78,16 +62,38 @@
                   { "Ref": "AWS::AccountId" },
                   ".dkr.ecr.",
                   { "Ref": "AWS::Region" },
-                  ".amazonaws.com/packt-store-checkout:",
+                  ".amazonaws.com/packt-store-cart:",
                   { "Ref": "ContainerTag" }
                 ]
               ]
             },
-            "Name": "checkout",
+            "Name": "cart",
+            "Environment": [
+              {
+                "Name": "REDIS_HOST",
+                "Value": "redis"
+              },
+              {
+                "Name": "REDIS_PORT",
+                "Value": "6379"
+              }
+            ],
             "PortMappings": [
               {
                 "ContainerPort": 5015,
                 "HostPort": 5015,
+                "Protocol": "tcp"
+              }
+            ]
+          },
+          {
+            "Essential": true,
+            "Image": "redis/redis-stack:latest",
+            "Name": "redis",
+            "PortMappings": [
+              {
+                "ContainerPort": 6379,
+                "HostPort": 6379,
                 "Protocol": "tcp"
               }
             ]
@@ -97,7 +103,7 @@
         "Family": { "Ref": "AWS::StackName" },
         "Memory": "1024",
         "NetworkMode": "awsvpc",
-        "RequiresCompatibilities": [{ "Ref": "EC2CapacityProvider" }],
+        "RequiresCompatibilities": ["FARGATE"],
         "ExecutionRoleArn": {
           "Fn::Join": [
             "",
@@ -118,58 +124,6 @@
             ]
           ]
         }
-      }
-    },
-    "ECSLaunchTemplate": {
-      "Type": "AWS::EC2::LaunchTemplate",
-      "DependsOn": "ECSCluster",
-      "Properties": {
-        "LaunchTemplateData": {
-          "ImageId": {
-            "Ref": "LatestECSOptimizedAMI"
-          },
-          "InstanceType": "t3.large",
-          "KeyName": "eks",
-          "IamInstanceProfile": {
-            "Arn": {
-              "Ref": "IamRoleInstanceProfile"
-            }
-          },
-          "UserData": {
-            "Fn::Base64": {
-              "Ref": "UserData"
-            }
-          }
-        }
-      }
-    },
-    "ECSAutoScalingGroup": {
-      "Type": "AWS::AutoScaling::AutoScalingGroup",
-      "DependsOn": ["ECSCluster", "ECSLaunchTemplate"],
-      "Properties": {
-        "MinSize": "1",
-        "MaxSize": 5,
-        "DesiredCapacity": "1",
-        "LaunchTemplate": {
-          "LaunchTemplateId": {
-            "Ref": "ECSLaunchTemplate"
-          },
-          "Version": {
-            "Fn::GetAtt": ["ECSLaunchTemplate", "LatestVersionNumber"]
-          }
-        },
-        "VPCZoneIdentifier": {
-          "Ref": "SubnetIDs"
-        },
-        "Tags": [
-          {
-            "Key": "Name",
-            "PropagateAtLaunch": true,
-            "Value": {
-              "Fn::Join": [" - ", ["ECS Instance", { "Ref": "AWS::StackName" }]]
-            }
-          }
-        ]
       }
     },
     "ECSService": {
@@ -197,12 +151,12 @@
             ]
           ]
         },
-        "ServiceName": "checkout",
+        "ServiceName": "cart",
         "SchedulingStrategy": "REPLICA",
         "DesiredCount": 1,
         "LoadBalancers": [
           {
-            "ContainerName": "checkout",
+            "ContainerName": "cart",
             "ContainerPort": 5015,
             "LoadBalancerName": {
               "Ref": "AWS::NoValue"
@@ -287,45 +241,11 @@
         "Port": 80,
         "Protocol": "HTTP"
       }
-    },
-    "EC2CapacityProvider": {
-      "Type": "AWS::ECS::CapacityProvider",
-      "Properties": {
-        "AutoScalingGroupProvider": {
-          "AutoScalingGroupArn": {
-            "Ref": "ECSAutoScalingGroup"
-          },
-          "ManagedScaling": {
-            "Status": "ENABLED",
-            "TargetCapacity": 100
-          },
-          "ManagedTerminationProtection": "DISABLED"
-        }
-      }
-    },
-    "ClusterCPAssociation": {
-      "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
-      "DependsOn": "ECSCluster",
-      "Properties": {
-        "Cluster": { "Ref": "AWS::StackName" },
-        "CapacityProviders": [
-          "FARGATE",
-          "FARGATE_SPOT",
-          { "Ref": "EC2CapacityProvider" }
-        ],
-        "DefaultCapacityProviderStrategy": [
-          {
-            "Base": 0,
-            "Weight": 1,
-            "CapacityProvider": { "Ref": "EC2CapacityProvider" }
-          }
-        ]
-      }
     }
   },
   "Outputs": {
-    "CheckoutUrl": {
-      "Description": "Url of the checkout service",
+    "CartUrl": {
+      "Description": "Url of the cart service",
       "Value": {
         "Fn::Join": [
           "",

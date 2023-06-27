@@ -28,8 +28,7 @@ jobs:
     #     targetPath: 'e2e/iac/aws/catalog'
     #     artifact: catalog-iac
     #     publishLocation: 'pipeline'
-    # - script: |
-    #     docker run --rm -v $(pwd):/manifests stackrox/kube-linter lint /manifests --config /manifests/.kube-linter.yml
+    # - script: docker run --rm -v $(pwd):/manifests stackrox/kube-linter lint /manifests --config /manifests/.kube-linter.yml
     #   displayName: 'Lint Catalog Helm Chart'
     #   workingDirectory: e2e/iac/helm-charts/catalog
     # - task: HelmInstaller@1
@@ -46,22 +45,20 @@ jobs:
     #     targetPath: $(Build.ArtifactStagingDirectory)
     #     artifact: catalog-helm-chart
     #     publishLocation: 'pipeline'
-    # - task: AWSCLI@1
-    #   displayName: 'Validate CloudFormation cart'
-    #   inputs:
-    #       awsCredentials: ${{parameters.awsConnection}}
-    #       regionName: ${{parameters.region}}
-    #       awsCommand: 'cloudformation'
-    #       awsSubCommand: 'validate-template'
-    #       awsArguments: '--template-body file://template.json'
-    #       workingDirectory: 'e2e/iac/aws/cart'
-    # - task: PublishPipelineArtifact@1
-    #   displayName: 'Publish Artifacts cart'
-    #   inputs:
-    #     targetPath: 'e2e/iac/aws/cart'
-    #     artifact: cart-iac
-    #     publishLocation: 'pipeline'
-
+    - task: AWSCLI@1
+      displayName: 'Validate CloudFormation cart'
+      inputs:
+          awsCredentials: ${{parameters.awsConnection}}
+          regionName: ${{parameters.region}}
+          awsCommand: 'cloudformation'
+          awsSubCommand: 'validate-template'
+          awsArguments: '--template-body file://e2e/iac/aws/cart/template.json'
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Artifacts cart'
+      inputs:
+        targetPath: 'e2e/iac/aws/cart'
+        artifact: cart-iac
+        publishLocation: 'pipeline'
     - task: AWSCLI@1
       displayName: 'Validate CloudFormation checkout'
       inputs:
