@@ -1,38 +1,297 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "AWS CloudFormation template for the frontend service",
+  "Description": "Creates the Elastic Container Service Cluster for the frontend service.",
   "Parameters": {
-    "EnvironmentName": {
+    "SecurityGroupIDs": {
+      "Type": "CommaDelimitedList",
+      "Default": "sg-c8d4b8b4"
+    },
+    "VpcID": {
       "Type": "String",
-      "Default": "test",
-      "AllowedValues": ["test", "production"],
-      "Description": "Environment name"
+      "Default": "vpc-0e30aa68"
+    },
+    "SubnetIDs": {
+      "Type": "CommaDelimitedList",
+      "Default": "subnet-9049279c,subnet-3e8ac665,subnet-e10150cc,subnet-9dbe35a1,subnet-886e68c1,subnet-897800ec"
+    },
+    "IamRoleInstanceProfile": {
+      "Type": "String",
+      "Description": "Specifies the Name or the Amazon Resource Name (ARN) of the instance profile associated with the IAM role for the instance",
+      "Default": "arn:aws:iam::643152877624:instance-profile/ecsInstanceRole"
+    },
+    "ContainerTag": {
+      "Type": "String",
+      "Default": "latest"
+    },
+    "Port": {
+      "Type": "Number",
+      "Default": 80
+    },
+    "CatalogUrl": {
+      "Type": "String",
+      "Default": "http://catalog/"
+    },
+    "CartUrl": {
+      "Type": "String",
+      "Default": "http://cart/"
+    },
+    "CheckoutUrl": {
+      "Type": "String",
+      "Default": "http://checkout/"
     }
   },
   "Resources": {
-    "FrontendContainer": {
-      "Type": "AWS::Lightsail::Container",
+    "ECSCluster": {
+      "Type": "AWS::ECS::Cluster",
       "Properties": {
-        "IsDisabled": false,
-        "Power": "nano",
-        "Scale": 1,
-        "ServiceName": {
+        "ClusterName": { "Ref": "AWS::StackName" },
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "enabled"
+          }
+        ],
+        "Configuration": {
+          "ExecuteCommandConfiguration": {
+            "Logging": "DEFAULT"
+          }
+        },
+        "ServiceConnectDefaults": {
+          "Namespace": { "Ref": "AWS::StackName" }
+        },
+        "Tags": []
+      }
+    },
+    "ECSTaskDefinition": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Essential": true,
+            "Environment": [
+              {
+                "Name": "PORT",
+                "Value": { "Ref": "Port" }
+              },
+              {
+                "Name": "CATALOG_API_URL",
+                "Value": { "Ref": "CatalogUrl" }
+              },
+              {
+                "Name": "CART_API_URL",
+                "Value": { "Ref": "CartUrl" }
+              },
+              {
+                "Name": "CHECKOUT_API_URL",
+                "Value": { "Ref": "CheckoutUrl" }
+              }
+            ],
+            "HealthCheck": {
+              "Command": [
+                "curl",
+                "-f",
+                {
+                  "Fn::Join": [
+                    "",
+                    ["http://localhost:", { "Ref": "Port" }, "/"]
+                  ]
+                }
+              ],
+              "Interval": 30,
+              "Retries": 3,
+              "StartPeriod": 30,
+              "Timeout": 5
+            },
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  { "Ref": "AWS::AccountId" },
+                  ".dkr.ecr.",
+                  { "Ref": "AWS::Region" },
+                  ".amazonaws.com/packt-store-frontend:",
+                  { "Ref": "ContainerTag" }
+                ]
+              ]
+            },
+            "Name": "frontend",
+            "PortMappings": [
+              {
+                "ContainerPort": { "Ref": "Port" },
+                "HostPort": { "Ref": "Port" },
+                "Protocol": "tcp"
+              }
+            ]
+          }
+        ],
+        "Cpu": "256",
+        "Family": { "Ref": "AWS::StackName" },
+        "Memory": "512",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": ["FARGATE"],
+        "ExecutionRoleArn": {
           "Fn::Join": [
-            "-",
+            "",
             [
-              { "Ref": "AWS::StackName" },
-              { "Ref": "EnvironmentName" },
-              "frontend"
+              "arn:aws:iam::",
+              { "Ref": "AWS::AccountId" },
+              ":role/ecsTaskExecutionRole"
+            ]
+          ]
+        },
+        "TaskRoleArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:iam::",
+              { "Ref": "AWS::AccountId" },
+              ":role/ecsTaskExecutionRole"
             ]
           ]
         }
       }
+    },
+    "ECSService": {
+      "Type": "AWS::ECS::Service",
+      "DependsOn": ["ECSCluster", "ECSTaskDefinition", "Listener"],
+      "Properties": {
+        "Cluster": { "Ref": "AWS::StackName" },
+        "CapacityProviderStrategy": [
+          {
+            "CapacityProvider": "FARGATE",
+            "Base": 0,
+            "Weight": 1
+          }
+        ],
+        "TaskDefinition": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:ecs:",
+              { "Ref": "AWS::Region" },
+              ":",
+              { "Ref": "AWS::AccountId" },
+              ":task-definition/",
+              { "Ref": "AWS::StackName" }
+            ]
+          ]
+        },
+        "ServiceName": "frontend",
+        "SchedulingStrategy": "REPLICA",
+        "DesiredCount": 1,
+        "LoadBalancers": [
+          {
+            "ContainerName": "frontend",
+            "ContainerPort": { "Ref": "Port" },
+            "LoadBalancerName": {
+              "Ref": "AWS::NoValue"
+            },
+            "TargetGroupArn": {
+              "Ref": "TargetGroup"
+            }
+          }
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "ENABLED",
+            "SecurityGroups": {
+              "Ref": "SecurityGroupIDs"
+            },
+            "Subnets": {
+              "Ref": "SubnetIDs"
+            }
+          }
+        },
+        "PlatformVersion": "LATEST",
+        "DeploymentConfiguration": {
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 100,
+          "DeploymentCircuitBreaker": {
+            "Enable": true,
+            "Rollback": true
+          }
+        },
+        "DeploymentController": {
+          "Type": "ECS"
+        },
+        "ServiceConnectConfiguration": {
+          "Enabled": false
+        },
+        "Tags": [],
+        "EnableECSManagedTags": true
+      }
+    },
+    "LoadBalancer": {
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+      "Properties": {
+        "Type": "application",
+        "Name": { "Fn::Join": ["", [{ "Ref": "AWS::StackName" }, "-lb"]] },
+        "SecurityGroups": {
+          "Ref": "SecurityGroupIDs"
+        },
+        "Subnets": {
+          "Ref": "SubnetIDs"
+        }
+      }
+    },
+    "TargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "HealthCheckPath": "/",
+        "Name": { "Fn::Join": ["", [{ "Ref": "AWS::StackName" }, "-tg"]] },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetType": "ip",
+        "HealthCheckProtocol": "HTTP",
+        "VpcId": {
+          "Ref": "VpcID"
+        }
+      }
+    },
+    "Listener": {
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+      "DependsOn": ["LoadBalancer", "TargetGroup"],
+      "Properties": {
+        "DefaultActions": [
+          {
+            "Type": "forward",
+            "TargetGroupArn": {
+              "Ref": "TargetGroup"
+            }
+          }
+        ],
+        "LoadBalancerArn": {
+          "Ref": "LoadBalancer"
+        },
+        "Port": 80,
+        "Protocol": "HTTP"
+      }
+    },
+    "ClusterCPAssociation": {
+      "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+      "DependsOn": "ECSCluster",
+      "Properties": {
+        "Cluster": { "Ref": "AWS::StackName" },
+        "CapacityProviders": ["FARGATE", "FARGATE_SPOT"],
+        "DefaultCapacityProviderStrategy": [
+          {
+            "Base": 0,
+            "Weight": 1,
+            "CapacityProvider": "FARGATE"
+          }
+        ]
+      }
     }
   },
   "Outputs": {
-    "URL": {
-      "Description": "URL of the frontend service",
-      "Value": { "Ref": "FrontendContainer" }
+    "FrontendUrl": {
+      "Description": "Url of the frontend service",
+      "Value": {
+        "Fn::Join": [
+          "",
+          ["http://", { "Fn::GetAtt": ["LoadBalancer", "DNSName"] }, "/"]
+        ]
+      }
     }
   }
 }
