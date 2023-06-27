@@ -39,7 +39,6 @@
       "Type": "AWS::ECS::Cluster",
       "Properties": {
         "ClusterName": { "Ref": "AWS::StackName" },
-        "CapacityProviders": ["FARGATE", "FARGATE_SPOT"],
         "ClusterSettings": [
           {
             "Name": "containerInsights",
@@ -52,14 +51,13 @@
           }
         },
         "ServiceConnectDefaults": {
-          "Namespace": "default"
+          "Namespace": { "Ref": "AWS::StackName" }
         },
         "Tags": []
       }
     },
     "ECSTaskDefinition": {
       "Type": "AWS::ECS::TaskDefinition",
-      "DependsOn": "EC2CapacityProvider",
       "Properties": {
         "ContainerDefinitions": [
           {
@@ -97,7 +95,7 @@
         "Family": { "Ref": "AWS::StackName" },
         "Memory": "1024",
         "NetworkMode": "awsvpc",
-        "RequiresCompatibilities": [{ "Ref": "EC2CapacityProvider" }],
+        "RequiresCompatibilities": ["EC2"],
         "ExecutionRoleArn": {
           "Fn::Join": [
             "",
