@@ -8,9 +8,11 @@ echo "Waiting for container service to be ready..."
 principal_arn=""
 until [ "$principal_arn" != "" ]
 do
+    echo -n .
     sleep 5
     principal_arn=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].privateRegistryAccess.ecrImagePullerRole.principalArn" --output text`
 done
+echo ""
 echo "Principal ARN: $principal_arn"
 # Aply ECR policy
 echo "Applying ECR policy..."
@@ -24,9 +26,11 @@ aws lightsail create-container-service-deployment --service-name $1 --region $2 
 state="DEPLOYING"
 until [ "$state" != "DEPLOYING" ]
 do
+    echo -n .
     sleep 5
     state=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].state" --output text`
 done
+echo ""
 if [ "$state" == "RUNNING" ]
 then
     echo "Deployment created successfully!"
