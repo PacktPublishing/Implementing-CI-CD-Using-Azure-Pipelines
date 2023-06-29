@@ -112,7 +112,7 @@ jobs:
             scriptLocation: 'inlineScript'
             inlineScript: |
               az aks get-credentials -g ${{ parameters.resourceGroupName }} -n $(clusterName) --overwrite-existing
-              ip=`kubectl get service catalog-packt-store-catalog -o json | jq ".status.loadBalancer.ingress[0].ip"`
+              ip=`kubectl get service catalog-packt-store-catalog -o json | jq -r ".status.loadBalancer.ingress[0].ip"`
               echo "Catalog App IP: $ip"
               echo "##vso[task.setvariable variable=catalogAppIp;]$ip"
         - task: PowerShell@2
