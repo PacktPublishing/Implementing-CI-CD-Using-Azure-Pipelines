@@ -7,7 +7,7 @@ stages:
 - stage: build
   displayName: Build
   jobs:
-  # - template: build-apps.yml
+  - template: build-apps.yml
   - template: build-iac.yml
 
 - stage: deployTest
@@ -18,10 +18,10 @@ stages:
     parameters:
       envName: test
 
-# - stage: deployProduction
-#   displayName: Deploy Production
-#   dependsOn: deployTest
-#   jobs:
-#   - template: deploy.yml
-#     parameters:
-#       envName: production
+- stage: deployProduction
+  displayName: Deploy Production
+  dependsOn: deployTest
+  jobs:
+  - template: deploy.yml
+    parameters:
+      envName: production
