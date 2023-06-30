@@ -10,8 +10,8 @@ parameters:
   default: 'us-east-1'
 - name: containerTag
   type: string
-  default: 'latest'
-  # default: '$(Build.BuildNumber)'
+  # default: 'latest'
+  default: '$(Build.BuildNumber)'
 
 jobs:
 - deployment: deployment_${{ parameters.envName }} 
@@ -21,6 +21,46 @@ jobs:
     runOnce:
       deploy:
         steps:
+        - download: current
+          displayName: 'Download catalog helm chart'
+          artifact: catalog-helm-chart
+        - task: HelmInstaller@1
+          displayName: 'Install Helm'
+          inputs:
+            helmVersionToInstall: 3.11.3
+        - task: AWSShellScript@1
+          displayName: 'Create EKS Cluster and Deploy Catalog App'
+          inputs:
+            awsCredentials: ${{ parameters.awsConnection }}
+            regionName: ${{ parameters.location }}
+            arguments: '${{ parameters.envName }}-catalog ${{ parameters.location }} ${{ parameters.containerTag }}'
+            disableAutoCwd: true
+            workingDirectory: '$(Pipeline.Workspace)/cart-iac'
+            failOnStandardError: true
+            scriptType: 'inline'
+            inlineScript: |
+              # Confirm Parameters
+              echo "SERVICE_NAME: $1"
+              echo "AWS_REGION: $2"
+              echo "CONTAINER_TAG: $3"
+              # Install EKSCTL 
+              ARCH=amd64
+              PLATFORM=$(uname -s)_$ARCH
+              curl -sLO "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+              tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+              sudo mv /tmp/eksctl /usr/local/bin
+              # Create Cluster
+              eksctl create cluster -n $1 --version 1.27 -t t3.large -m 1 -M 2 --full-ecr-access
+              # Retrieve AWS Account ID
+              AWSACCOUNTID=`aws sts get-caller-identity --query Account --output text`
+              # echo "##vso[task.setvariable variable=AWSACCOUNTID;]$AWSACCOUNTID"
+              # Deploy Catalog App to EKS
+              helm upgrade --install --set image.tag=${{ parameters.containerTag }},image.repository=$AWSACCOUNTID.dkr.ecr.${{ parameters.location }}.amazonaws.com/packt-store-catalog --wait catalog $(Pipeline.Workspace)/catalog-helm-chart/packt-store-catalog-1.0.0.tgz
+              CATALOG_HOSTNAME=`kubectl get service catalog-packt-store-catalog -o json | jq -r ".status.loadBalancer.ingress[0].hostname"`
+              CATALOG_URL="http://$CATALOG_HOSTNAME:5050/"
+              echo "Catalog URL: $CATALOG_URL"
+              echo "##vso[task.setvariable variable=CatalogUrl;]$CATALOG_URL"
+
         - download: current
           displayName: 'Download cart iac'
           artifact: cart-iac
@@ -32,11 +72,70 @@ jobs:
             stackName: '${{ parameters.envName }}-cart'
             templateSource: 'file'
             templateFile: '$(Pipeline.Workspace)/cart-iac/template.json'
-            templateParametersSource: 'inline'
-            templateParameters: '[{"ParameterKey":"ContainerTag","ParameterValue":"${{ parameters.containerTag }}"}]'
             onFailure: 'DELETE'
             captureStackOutputs: 'asVariables'
             captureAsSecuredVars: false
+        - task: AWSShellScript@1
+          displayName: 'Deploy cart container'
+          inputs:
+            awsCredentials: ${{ parameters.awsConnection }}
+            regionName: ${{ parameters.location }}
+            arguments: '${{ parameters.envName }}-cart ${{ parameters.location }} ${{ parameters.containerTag }}'
+            disableAutoCwd: true
+            workingDirectory: '$(Pipeline.Workspace)/cart-iac'
+            failOnStandardError: true
+            scriptType: 'inline'
+            inlineScript: |
+              # Confirm Parameters
+              echo "SERVICE_NAME: $1"
+              echo "AWS_REGION: $2"
+              echo "CONTAINER_TAG: $3"
+              # Add Private Registry Access
+              aws lightsail update-container-service --service-name $1 --region $2 --private-registry-access file://private-registry-access.json 
+              echo "Waiting for container service to be ready..."
+              principal_arn=""
+              until [ "$principal_arn" != "" ]
+              do
+                  echo -n .
+                  sleep 5
+                  principal_arn=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].privateRegistryAccess.ecrImagePullerRole.principalArn" --output text`
+              done
+              echo ""
+              echo "Principal ARN: $principal_arn"
+              # Aply ECR policy
+              echo "Applying ECR policy..."
+              sed "s|IamRolePrincipalArn|$principal_arn|g" ecr-policy-template.json > ecr-policy.json
+              aws ecr set-repository-policy --repository-name packt-store-cart --policy-text file://ecr-policy.json
+              # Wait until container service is ready for update
+              state="UPDATING"
+              until [ "$state" != "UPDATING" ]
+              do
+                  echo -n .
+                  sleep 5
+                  state=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].state" --output text`
+              done
+              echo ""
+              # Create Deployment
+              account_id=`aws sts get-caller-identity --query "Account" --output text`
+              sed "s|SERVICENAME|$1|g ; s|AWSACCOUNTID|$account_id|g ; s|AWSREGION|$2|g ; s|CONTAINERTAG|$3|g" deployment-template.json > deployment.json
+              echo "Creating deployment..."
+              aws lightsail create-container-service-deployment --service-name $1 --region $2 --cli-input-json file://deployment.json
+              state="DEPLOYING"
+              until [ "$state" != "DEPLOYING" ]
+              do
+                  echo -n .
+                  sleep 5
+                  state=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].state" --output text`
+              done
+              echo ""
+              if [ "$state" == "RUNNING" ]
+              then
+                  echo "Deployment created successfully!"
+              else
+                  echo "Deployment failed!"
+                  exit 1
+              fi
+
         - download: current
           displayName: 'Download checkout iac'
           artifact: checkout-iac
@@ -53,22 +152,10 @@ jobs:
             onFailure: 'DELETE'
             captureStackOutputs: 'asVariables'
             captureAsSecuredVars: false
+
         - download: current
           displayName: 'Download frontend iac'
           artifact: frontend-iac
-        # - task: AWSShellScript@1
-        #   displayName: 'Set App URLs'
-        #   inputs:
-        #     awsCredentials: ${{ parameters.awsConnection }}
-        #     regionName: ${{ parameters.location }}
-        #     scriptType: 'inline'
-        #     failOnStandardError: true
-        #     inlineScript: |
-        #       # Set the checkout app url
-        #       var=`aws ecs list-tasks --cluster ${{ parameters.envName }}-checkout --service-name checkout --query x --output text`
-        #       value="http://" + $var.containerFQDN.value + ":5015/"
-        #       echo "Checkout App Url: $value"
-        #       echo "##vso[task.setvariable variable=checkoutAppUrl;]$value"
         - task: CloudFormationCreateOrUpdateStack@1
           displayName: 'Create frontend stack'
           inputs:
@@ -78,55 +165,7 @@ jobs:
             templateSource: 'file'
             templateFile: '$(Pipeline.Workspace)/frontend-iac/template.json'
             templateParametersSource: 'inline'
-            templateParameters: '[{"ParameterKey":"EnvironmentName","ParameterValue":"${{ parameters.envName }}"}]'
+            templateParameters: '[{"ParameterKey":"ContainerTag","ParameterValue":"${{ parameters.containerTag }}"}, {"ParameterKey":"CatalogUrl","ParameterValue":"$CatalogUrl"}, {"ParameterKey":"CartUrl","ParameterValue":"$CartUrl"} {"ParameterKey":"CheckoutUrl","ParameterValue":"$CheckoutUrl"}]'
             onFailure: 'DELETE'
-        - task: AWSShellScript@1
-          displayName: 'Deploy frontend container'
-          inputs:
-            awsCredentials: ${{ parameters.awsConnection }}
-            regionName: ${{ parameters.location }}
-            arguments: '${{ parameters.envName }}-frontend ${{ parameters.location }} packt-store-frontend ${{ parameters.containerTag }} http://catalog:5050/ $(CartUrl) $(CheckoutUrl)'
-            disableAutoCwd: true
-            workingDirectory: '$(Pipeline.Workspace)/frontend-iac'
-            failOnStandardError: true
-            scriptType: 'inline'
-            inlineScript: |
-              # Confirm Parameters
-              echo "SERVICE_NAME: $1"
-              echo "AWS_REGION: $2"
-              echo "REPO_NAME: $3"
-              echo "CONTAINER_TAG: $4"
-              echo "CATALOG_API_URL_VALUE: $5"
-              echo "CART_API_URL_VALUE: $6"
-              echo "CHECKOUT_API_URL_VALUE: $7"
-              aws lightsail update-container-service --service-name $1 --region $2 --private-registry-access file://private-registry-access.json 
-              echo "Waiting for container service to be ready..."
-              principal_arn=""
-              until [ "$principal_arn" != "" ]
-              do
-                  sleep 5
-                  principal_arn=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].privateRegistryAccess.ecrImagePullerRole.principalArn" --output text`
-              done
-              echo "Principal ARN: $principal_arn"
-              # Aply ECR policy
-              echo "Applying ECR policy..."
-              sed "s|IamRolePrincipalArn|$principal_arn|g" ecr-policy-template.json > ecr-policy.json
-              aws ecr set-repository-policy --repository-name $3 --policy-text file://ecr-policy.json
-              # Create Deployment
-              account_id=`aws sts get-caller-identity --query "Account" --output text`
-              sed "s|AWSACCOUNTID|$account_id|g ; s|AWSREGION|$2|g ; s|REPO_NAME|$3|g ; s|CONTAINERTAG|$4|g ; s|CATALOG_API_URL_VALUE|$5|g ; s|CART_API_URL_VALUE|$6|g ; s|CHECKOUT_API_URL_VALUE|$7|g" deployment-template.json > deployment.json
-              echo "Creating deployment..."
-              aws lightsail create-container-service-deployment --service-name $1 --region $2 --cli-input-json file://deployment.json
-              state="DEPLOYING"
-              until [ "$state" != "DEPLOYING" ]
-              do
-                  sleep 5
-                  state=`aws lightsail get-container-services --service-name $1 --region $2 --query "containerServices[0].state" --output text`
-              done
-              if [ "$state" == "RUNNING" ]
-              then
-                  echo "Deployment created successfully!"
-              else
-                  echo "Deployment failed!"
-                  exit 1
-              fi
+            captureStackOutputs: 'asVariables'
+            captureAsSecuredVars: false
