@@ -1,29 +1,39 @@
 parameters:
-- name: awsRegistry
+- name: awsConnection
   type: string
-  default: 'aws-ecr'
+  default: 'aws-packt'
+- name: location
+  type: string
+  default: 'us-east-1'
 
 jobs:
 - job: BuildAndPushContainers
   displayName: Build and Push Containers
   steps:
-  - task: DockerCompose@0
-    displayName: 'Build Containers'
+  - task: AWSShellScript@1
+    displayName: 'Build and Push Containers'
     inputs:
-      containerregistrytype: 'Container Registry'
-      dockerRegistryEndpoint: ${{parameters.awsRegistry}}
-      dockerComposeFile: 'docker-compose.yml'
-      projectName: 'packt-store'
-      action: 'Build services'
-      additionalImageTags: '$(Build.BuildNumber)'
-      includeLatestTag: true
-  - task: DockerCompose@0
-    displayName: 'Push Containers'
-    inputs:
-      containerregistrytype: 'Container Registry'
-      dockerRegistryEndpoint: ${{parameters.awsRegistry}}
-      dockerComposeFile: 'docker-compose.yml'
-      projectName: 'packt-store'
-      action: 'Push services'
-      additionalImageTags: '$(Build.BuildNumber)'
-      includeLatestTag: true
+      awsCredentials: ${{ parameters.awsConnection }}
+      regionName: ${{ parameters.location }}
+      failOnStandardError: false
+      scriptType: 'inline'
+      inlineScript: |
+        # Set variables for AWS Region and Account ID
+        L="${{ parameters.location }}"
+        ID=`aws sts get-caller-identity --query Account --output text`
+        # Login to ECR
+        aws ecr get-login-password | docker login --username AWS --password-stdin $ID.dkr.ecr.$L.amazonaws.com
+        # Build images with docker-compose
+        docker-compose build
+        # Tag and push images to ECR
+        declare -a services=("catalog" "cart" "checkout" "frontend")
+        declare -a tags=("$(Build.BuildNumber)" "latest")
+        for s in "${services[@]}"
+        do
+          echo "Pushing images for $s"
+          for t in "${tags[@]}"
+          do
+            docker tag packt-store-$s:latest $ID.dkr.ecr.$L.amazonaws.com/packt-store-$s:$t
+            docker push $ID.dkr.ecr.$L.amazonaws.com/packt-store-$s:$t
+          done
+        done
