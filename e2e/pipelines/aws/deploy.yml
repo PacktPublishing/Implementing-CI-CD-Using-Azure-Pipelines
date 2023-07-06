@@ -29,7 +29,7 @@ jobs:
           inputs:
             helmVersionToInstall: 3.11.3
         - task: AWSShellScript@1
-          displayName: 'Create EKS Cluster and Deploy Catalog App'
+          displayName: 'Deploy catalog iac and container'
           inputs:
             awsCredentials: ${{ parameters.awsConnection }}
             regionName: ${{ parameters.location }}
