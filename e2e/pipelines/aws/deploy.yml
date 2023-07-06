@@ -10,7 +10,6 @@ parameters:
   default: 'us-east-1'
 - name: containerTag
   type: string
-  # default: 'latest'
   default: '$(Build.BuildNumber)'
 
 jobs:
