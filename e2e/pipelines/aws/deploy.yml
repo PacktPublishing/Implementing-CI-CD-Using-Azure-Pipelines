@@ -168,3 +168,10 @@ jobs:
             onFailure: 'DELETE'
             captureStackOutputs: 'asVariables'
             captureAsSecuredVars: false
+
+        - script: |
+            echo "Catalog URL: $CatalogUrl"
+            echo "Cart URL: $CartUrl"
+            echo "Checkout URL: $CheckoutUrl"
+            echo "Frontend URL: $FrontendUrl"
+          displayName: 'Display URLs'
