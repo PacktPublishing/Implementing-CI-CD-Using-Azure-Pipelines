@@ -146,11 +146,11 @@
   }],
   "suites": [{
     "id": "382055d7-58b1-4a7e-9fb3-b8adbdc70f30",
-    "name": "Default Suite",
+    "name": "Packt Store Suite",
     "persistSession": false,
     "parallel": false,
     "timeout": 300,
-    "tests": []
+    "tests": ["bb9d581a-d7dd-4b7c-877a-3139938ef8e5"]
   }],
   "urls": ["http://localhost:5030/"],
   "plugins": []
