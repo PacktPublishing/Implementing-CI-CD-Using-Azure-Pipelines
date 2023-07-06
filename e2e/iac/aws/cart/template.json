@@ -28,7 +28,7 @@
     }
   },
   "Outputs": {
-    "CartURL": {
+    "CartUrl": {
       "Description": "URL of the cart service",
       "Value": { "Fn::GetAtt": ["CartContainer", "Url"] }
     }
