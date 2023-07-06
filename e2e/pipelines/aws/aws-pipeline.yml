@@ -16,7 +16,7 @@ stages:
   jobs:
   - template: deploy.yml
     parameters:
-      envName: test
+      envName: awstest
 
 - stage: deployProduction
   displayName: Deploy Production
@@ -24,4 +24,4 @@ stages:
   jobs:
   - template: deploy.yml
     parameters:
-      envName: production
+      envName: awsproduction
