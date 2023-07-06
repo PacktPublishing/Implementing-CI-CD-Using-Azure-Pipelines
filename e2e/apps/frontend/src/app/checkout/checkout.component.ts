@@ -21,7 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
       <h2>Your order {{orderResponse?.orderId}} has been placed.</h2>
       <h3>{{orderResponse?.message}}</h3>
       <a [routerLink]="['/']">
-          <button mat-raised-button color="primary" aria-label="Packt Store">
+          <button mat-raised-button id="continue-shopping" color="primary" aria-label="Packt Store">
             Continue Shopping
           </button>
       </a>

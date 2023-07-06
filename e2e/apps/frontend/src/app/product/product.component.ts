@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
     <section class="product">
       <h2 class="product-name">{{ product.name }}</h2>
       <p class="product-price">{{ product.price | currency }}</p>
-      <button mat-fab extended color="primary" aria-label="Add to cart" (click)="addToCart(product.sku)">
+      <button mat-fab extended color="primary" aria-label="Add to cart" class="add-to-cart" id="add-to-cart-{{product.sku}}" (click)="addToCart(product.sku)">
         <mat-icon>add</mat-icon>
         Add to Cart
       </button>

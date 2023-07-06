@@ -83,7 +83,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
         <mat-form-field class="example-full-width">
           <mat-label>First Name</mat-label>
           <input type="firstName" matInput [formControl]="firstName" [errorStateMatcher]="matcher"
-                placeholder="Ex. John">
+                placeholder="Ex. John" id="first-name">
           <mat-error *ngIf="firstName.hasError('required')">
             <strong>Required</strong>
           </mat-error>
@@ -91,7 +91,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
         <mat-form-field class="example-full-width">
           <mat-label>Last Name</mat-label>
           <input type="lastName" matInput [formControl]="lastName" [errorStateMatcher]="matcher"
-                placeholder="Ex. Doe">
+                placeholder="Ex. Doe" id="last-name">
           <mat-error *ngIf="lastName.hasError('required')">
             <strong>Required</strong>
           </mat-error>
@@ -99,7 +99,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
         <mat-form-field class="example-full-width">
           <mat-label>Email</mat-label>
           <input type="email" matInput [formControl]="email" [errorStateMatcher]="matcher"
-                placeholder="Ex. pat@example.com">
+                placeholder="Ex. pat@example.com" id="email">
           <mat-error *ngIf="email.hasError('email') && !email.hasError('required')">
             Please enter a valid email address
           </mat-error>
@@ -107,7 +107,7 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
             <strong>Required</strong>
           </mat-error>
         </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Submit</button>
+        <button mat-raised-button color="primary" type="submit" id="submit-order">Submit</button>
       </form>
     </section>
   `,

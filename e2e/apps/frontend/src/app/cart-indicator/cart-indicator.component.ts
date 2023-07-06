@@ -12,7 +12,7 @@ import { Cart } from '../cart';
     RouterModule
   ],
   template: `
-    <a [routerLink]="['/cart']">
+    <a [routerLink]="['/cart']" id="cart-indicator">
       <label class="cart-indicator">
         Items in Cart <span class="value">({{ getTotalItems() | number}})</span>
       </label>
