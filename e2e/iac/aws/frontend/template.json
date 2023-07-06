@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Creates the Elastic Container Service Cluster for the frontend service.",
+  "Description": "Packt Store Frontend Service.",
   "Parameters": {
     "SecurityGroupIDs": {
       "Type": "CommaDelimitedList",

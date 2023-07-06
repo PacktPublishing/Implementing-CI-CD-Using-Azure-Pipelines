@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "AWS CloudFormation template for the cart service",
+  "Description": "Packt Store Cart Service",
   "Parameters": {},
   "Resources": {
     "CartContainer": {

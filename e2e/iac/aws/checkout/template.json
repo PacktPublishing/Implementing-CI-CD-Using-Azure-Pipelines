@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Creates the Elastic Container Service Cluster for the checkout service.",
+  "Description": "Packt Store Checkout Service.",
   "Parameters": {
     "SecurityGroupIDs": {
       "Type": "CommaDelimitedList",
