@@ -165,14 +165,14 @@ jobs:
             templateSource: 'file'
             templateFile: '$(Pipeline.Workspace)/frontend-iac/template.json'
             templateParametersSource: 'inline'
-            templateParameters: '[{"ParameterKey":"ContainerTag","ParameterValue":"${{ parameters.containerTag }}"}, {"ParameterKey":"CatalogUrl","ParameterValue":"$CatalogUrl"}, {"ParameterKey":"CartUrl","ParameterValue":"$CartUrl"}, {"ParameterKey":"CheckoutUrl","ParameterValue":"$CheckoutUrl"}]'
+            templateParameters: '[{"ParameterKey":"ContainerTag","ParameterValue":"${{ parameters.containerTag }}"}, {"ParameterKey":"CatalogUrl","ParameterValue":"$(CatalogUrl)"}, {"ParameterKey":"CartUrl","ParameterValue":"$(CartUrl)"}, {"ParameterKey":"CheckoutUrl","ParameterValue":"$(CheckoutUrl)"}]'
             onFailure: 'DELETE'
             captureStackOutputs: 'asVariables'
             captureAsSecuredVars: false
 
         - script: |
-            echo "Catalog Url: $CatalogUrl"
-            echo "Cart Url: $CartUrl"
-            echo "Checkout Url: $CheckoutUrl"
-            echo "Frontend Url: $FrontendUrl"
+            echo "Catalog Url: $(CatalogUrl)"
+            echo "Cart Url: $(CartUrl)"
+            echo "Checkout Url: $(CheckoutUrl)"
+            echo "Frontend Url: $(FrontendUrl)"
           displayName: 'Display URLs'
