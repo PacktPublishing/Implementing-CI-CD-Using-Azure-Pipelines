@@ -52,7 +52,6 @@ jobs:
               eksctl create cluster -n $1 --version 1.27 -t t3.large -m 1 -M 2 --full-ecr-access
               # Retrieve AWS Account ID
               AWSACCOUNTID=`aws sts get-caller-identity --query Account --output text`
-              # echo "##vso[task.setvariable variable=AWSACCOUNTID;]$AWSACCOUNTID"
               # Deploy Catalog App to EKS
               helm upgrade --install --set image.tag=${{ parameters.containerTag }},image.repository=$AWSACCOUNTID.dkr.ecr.${{ parameters.location }}.amazonaws.com/packt-store-catalog --wait catalog $(Pipeline.Workspace)/catalog-helm-chart/packt-store-catalog-1.0.0.tgz
               CATALOG_HOSTNAME=`kubectl get service catalog-packt-store-catalog -o json | jq -r ".status.loadBalancer.ingress[0].hostname"`
