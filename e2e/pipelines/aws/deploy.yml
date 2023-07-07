@@ -104,7 +104,8 @@ jobs:
               # Aply ECR policy
               echo "Applying ECR policy..."
               sed "s|IamRolePrincipalArn|$principal_arn|g" ecr-policy-template.json > ecr-policy.json
-              aws ecr delete-repository-policy --repository-name packt-store-cart
+              # redirect stderr to /dev/null to avoid error if policy does not exist
+              aws ecr delete-repository-policy --repository-name packt-store-cart 2>/dev/null
               aws ecr set-repository-policy --repository-name packt-store-cart --policy-text file://ecr-policy.json
               # Wait until container service is ready for update
               state="UPDATING"
