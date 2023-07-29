@@ -2,3 +2,5 @@
 .terraform*
 *.tfplan*
 *.tfstate*
+*b64
+*.jks
