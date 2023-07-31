@@ -1,0 +1,54 @@
+trigger: none
+pool:
+  vmImage: "macos-latest"
+variables:
+  - group: secrets
+  - name: iosReleaseDir
+    value: $(Build.SourcesDirectory)/flutter/hello_world/build/ios/ipa
+  - name: ipaFile
+    value: $(iosReleaseDir)/hello_world.ipa
+  - name: rootPath
+    value: $(System.DefaultWorkingDirectory)/flutter/hello_world
+jobs:
+  - job: ios_deployment
+    steps:
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '11'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+    - task: InstallAppleCertificate@2
+      displayName: "Install Apple cert dist p12"
+      inputs:
+        certSecureFile: "Certificates_Distribution.p12"
+        certPwd: "$(APPLE_CERTIFICATE_SIGNING_PASSWORD)"
+        keychain: "temp"
+    - task: InstallAppleProvisioningProfile@1
+      displayName: "Install Apple Mobile Provisioning Profile"
+      inputs:
+        provisioningProfileLocation: "secureFiles"
+        provProfileSecureFile: "Hello_Flutter_AppStore.mobileprovision"
+    - task: Hey24sheep.flutter.flutter-install.FlutterInstall@0
+      displayName: 'Flutter Install'
+      inputs:
+        version: custom
+        customVersion: 3.10.6
+    - task: Bash@3
+      displayName: "Build IPA"
+      inputs:
+        targetType: "inline"
+        script: |
+          flutter build ipa --export-options-plist=$(rootPath)/ios/Runner/ExportOptions.plist
+        workingDirectory: $(rootPath)
+    - task: Bash@3
+      displayName: "Upload to firebase app distribution"
+      inputs:
+        targetType: "inline"
+        script: |
+          npm i -g firebase-tools
+          ls -la $(iosReleaseDir)
+          firebase appdistribution:distribute "$(ipaFile)" \
+            --app "$(IOS_APP_ID)" \
+            --release-notes "Build iOS From Azure Pipeline" \
+            --groups "beta-testers" \
+            --token "$(FIREBASE_TOKEN)"

@@ -1,0 +1,51 @@
+trigger: none
+pool:
+  vmImage: "ubuntu-latest"
+variables:
+  - group: secrets
+  - name: androidReleaseDir
+    value: $(build.artifactStagingDirectory)/flutter/hello_world/build/app/outputs/bundle/release
+  - name: aabFile
+    value: $(androidReleaseDir)/app-release.aab
+jobs:
+  - job: android_to_google_play_store
+    steps:
+    - task: DownloadSecureFile@1
+      displayName: "Download keystore file"
+      name: "KeyStoreFile"
+      inputs:
+        secureFile: "upload-keystore.jks"
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '11'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+    - task: Hey24sheep.flutter.flutter-install.FlutterInstall@0
+      displayName: 'Flutter Install'
+      inputs:
+        version: custom
+        customVersion: 3.10.6
+    - task: Hey24sheep.flutter.flutter-build.FlutterBuild@0
+      displayName: "Build AAB"
+      inputs:
+        target: aab
+        projectDirectory: "./flutter/hello_world"
+        buildNumber: ""
+    - task: CopyFiles@2
+      displayName: "Copy aab to artifact directory"
+      inputs:
+        contents: "**/*.aab"
+        targetFolder: "$(build.artifactStagingDirectory)"
+    - task: PublishBuildArtifacts@1
+      displayName: "Publish signed AAB as artifact"
+      inputs:
+        artifactName: "drop"
+    - task: GooglePlayRelease@4
+      displayName: "Upload to Google Play Store"
+      inputs:
+        serviceConnection: 'GooglePlayConsole'
+        applicationId: 'com.company.flutter'
+        action: 'SingleBundle'
+        bundleFile: '$(aabFile)'
+        track: 'internal'
+        isDraftRelease: true

@@ -1,21 +1,20 @@
-trigger:
-  branches:
-    include:
-    - master
-  paths:
-    include:
-    - flutter/hello_world/*
+trigger: none
+pool:
+  vmImage: "ubuntu-latest"
+variables:
+  - group: secrets
+  - name: androidReleaseDir
+    value: $(build.artifactStagingDirectory)/flutter/hello_world/build/app/outputs/flutter-apk
+  - name: apkFile
+    value: $(androidReleaseDir)/app-release.apk
 jobs:
   - job: android_deployment
-    pool:
-      vmImage: "macos-latest"
-    variables:
-      - group: secrets
-      - name: androidReleaseDir
-        value: $(build.artifactStagingDirectory)/build/app/outputs/flutter-apk
-      - name: apkFile
-        value: $(androidReleaseDir)/app-release.apk
     steps:
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '11'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     - task: Hey24sheep.flutter.flutter-install.FlutterInstall@0
       displayName: 'Flutter Install'
       inputs:
@@ -25,14 +24,14 @@ jobs:
       displayName: "Build APK"
       inputs:
         target: apk
-        projectDirectory: "."
+        projectDirectory: "./flutter/hello_world"
         buildNumber: ""
     - task: AndroidSigning@3
       displayName: "Signing and aligning APK file(s) **/*.apk"
       inputs:
         apkFiles: "**/*.apk"
         apksign: true
-        apksignerKeystoreFile: $(ANDROID_KEYSTORE_FILE)
+        apksignerKeystoreFile: "upload-keystore.jks"
         apksignerKeystorePassword: "$(ANDROID_KEYSTORE_PRIVATE_PASSWORD)"
         apksignerKeystoreAlias: "$(ANDROID_KEYSTORE_ALIAS)"
         apksignerKeyPassword: "$(ANDROID_KEYSTORE_PASSWORD)"

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>method</key>
+        <string>app-store</string>
+        <key>teamID</key>
+        <string>EB7BHC445Y</string>
+        <key>provisioningProfiles</key>
+        <dict>
+            <key>com.company.flutter</key>
+            <string>Hello Flutter AppStore</string>
+        </dict>
+ </dict>
+ </plist>
