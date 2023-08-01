@@ -4,4 +4,4 @@
 *.tfstate*
 *b64
 *.jks
-*GoogleService-Info.plist
+*GoogleService*.plist
