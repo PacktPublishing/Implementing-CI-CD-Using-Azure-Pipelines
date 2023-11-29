@@ -1,0 +1,36 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Packt Store Cart Service",
+  "Parameters": {},
+  "Resources": {
+    "CartContainer": {
+      "Type": "AWS::Lightsail::Container",
+      "Properties": {
+        "ContainerServiceDeployment": {
+          "Containers": [
+            {
+              "ContainerName": "redis",
+              "Image": "redis/redis-stack:latest",
+              "Ports": [
+                {
+                  "Port": 6379,
+                  "Protocol": "TCP"
+                }
+              ]
+            }
+          ]
+        },
+        "IsDisabled": false,
+        "Power": "micro",
+        "Scale": 1,
+        "ServiceName": { "Ref": "AWS::StackName" }
+      }
+    }
+  },
+  "Outputs": {
+    "CartUrl": {
+      "Description": "URL of the cart service",
+      "Value": { "Fn::GetAtt": ["CartContainer", "Url"] }
+    }
+  }
+}

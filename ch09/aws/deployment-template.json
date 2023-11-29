@@ -1,0 +1,35 @@
+{
+  "serviceName": "SERVICENAME",
+  "containers": {
+    "cart": {
+      "image": "AWSACCOUNTID.dkr.ecr.AWSREGION.amazonaws.com/packt-store-cart:CONTAINERTAG",
+      "environment": {
+        "NODE_ENV": "production",
+        "PORT": "5075",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379"
+      },
+      "ports": {
+        "5075": "HTTP"
+      }
+    },
+    "redis": {
+      "image": "redis/redis-stack:latest",
+      "ports": {
+        "6379": "TCP"
+      }
+    }
+  },
+  "publicEndpoint": {
+    "containerName": "cart",
+    "containerPort": 5075,
+    "healthCheck": {
+      "healthyThreshold": 2,
+      "intervalSeconds": 30,
+      "path": "/health",
+      "successCodes": "200-499",
+      "timeoutSeconds": 5,
+      "unhealthyThreshold": 2
+    }
+  }
+}
